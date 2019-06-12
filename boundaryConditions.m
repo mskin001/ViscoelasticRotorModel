@@ -54,6 +54,9 @@ elseif length(w) == 1 % Second part for pe and ve simulations
       z = rim(k)/rim(k+1);
       z1 = z^-kappa + z^kappa;
       z2 = z^-kappa - z^kappa;
+      
+      % Axial strain coefficients
+      [e0, e1] = axialStrain(b,k, kappa);
 
       % Local stiffness matrix
       kMat = (1/z2) * [kappa*z1*Q33-z2*Q13, -2*kappa*Q33;
@@ -62,7 +65,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
       % Global stiffness matrix for the entire
       K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
 
-      fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
+      fsig = -(mat.rho{k})*w^2*fi5*[-rim(k)^3; rim(k+1)^3];
       uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
       u0 = fi4 * [rim(k); rim(k+1)];
       u1 = fi3 * [rim(k)^2; rim(k+1)^2];
@@ -70,9 +73,11 @@ elseif length(w) == 1 % Second part for pe and ve simulations
       fw = -fsig + kMat*uw;
       Fw(k:k+1) = Fw(k:k+1) + fw;
       
+      f0 = fi7 * [-rim(k); rim(k+1)]*e0;
       fe0 = -f0 + kMat*u0;
       F0(k:k+1) = F0(k:k+1) + fe0;
       
+      f1 = fi6 * [-rim(k)^2; rim(k+1)^2] * e1;
       fe1 = -f1 + kMat*u1;
       F1(k:k+1) = F1(k:k+1) + fe1;
       
