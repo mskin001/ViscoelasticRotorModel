@@ -1,0 +1,13 @@
+Name Format: fiber_matrix_authorYear.mat
+
+
+mstiff = [E11, E22, G12, G23, nu12]
+% mstiff properties are over written when calculating the creep stiffness matrix. Because of this you can put any value into mstiff to satisfy the program as long as you only use that material for viscoelastic simulations.
+
+rho = % density. You must specify a density in the material's workspace.
+
+stren = [Longitudinal Tensile, Longitudinal Compressive, Transversie Tensile, Transverse Compressive, Longitudinal Shear]
+% This field is not strictly necessary for the operation of the program, can be left blank if desired.
+
+MS_verified = %can be either yes or no. 
+% Yes indicates I have verified the material properties are correct based on information available at the creation of the file. No does not mean the properties are wrong, but that I have not personally verified them.

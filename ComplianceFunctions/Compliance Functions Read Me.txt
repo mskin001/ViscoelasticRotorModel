@@ -1,0 +1,19 @@
+function [varargout] = %materialName%_%source/year%()
+
+% Description of the material, source, curve fitting, goodness of fit parameters, any other relevant information
+
+global t % initiate the globat time value so the program can read the current time
+
+% Define any constants needed to reproduce the compliance curve.
+a = 
+b = 
+c = 
+d =
+.
+.
+.
+
+varargout{1} = f(t,a,b,c,d,...) % equation used to reproduce the compliance curve for S22 direction.
+% Note the mstiff function assumes varargout{1} = S22, varargout{2} = S33, and varargout{3} = S11 directions.
+
+end
