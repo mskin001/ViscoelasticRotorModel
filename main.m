@@ -24,7 +24,7 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-1.6e8, 0];
+sigb = [0, 0];
 mats = {'Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
@@ -182,27 +182,27 @@ prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
 setappdata(prog,'Canceling',0);
 
 for b = 1:vari
-  t = tArr(b);  
+  t = tArr(b);
   if getappdata(prog,'Canceling')
     delete(prog)
     return
   end
-  
+
   for k = 1:length(mats)
       mat.file{k} = ['MaterialProperties\', mats{k}];
       matProp = load(mat.file{k});
       mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
       mat.rho{k} = matProp.rho;
-      
+
       try
         mat.stren{k} = matProp.stren;
       catch
         break
       end
   end
-  
+
   perc = (b / vari);
-  waitbar(perc,prog)  
+  waitbar(perc,prog)
 end
 
 delete(prog)
@@ -213,7 +213,7 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-[~, ~, ~, ~] = boundaryConditions(sigb, delta);
+[~, ~, ~, ~, e0, e1] = boundaryConditions(sigb, delta);
 
 if vari == -1
   return
@@ -224,7 +224,7 @@ fprintf('Calculate Boundary Conditions: Complete\n')
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
-[~] = discretizeStressStrain(rdiv, delta);
+[~] = discretizeStressStrain(rdiv, delta, e0, e1);
 
 if vari == -1
   return
