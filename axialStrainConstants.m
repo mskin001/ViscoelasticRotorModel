@@ -15,19 +15,21 @@ fi2 = 1 / (Q13 - kappa*Q33);
 fi3 = (Q12 - 2*Q23) / (4*Q33 - Q11);
 fi4 = (Q12 - Q23) / (Q33 - Q11);
 
-fsig = (-3/3) * mat.rho{k} * w^2 * fi0 * (Q12 + Q23) * (-rim(k)^3 + rim(k+1)^3);
-f1 = (1/2) * (fi3*(Q12 + 2*Q23) + Q22) * (-rim(k)^2 + rim(k+1)^2);
-f0 = (1/1) * (fi4*(Q12 + Q23) + Q22) * (-rim(k)^1 + rim(k+1)^1);
-fCT = (1/(kappa)) * (Q12 + kappa*Q23) * fi1 * (-rim(k)^(kappa) + rim(k+1)^(-kappa))...
-      + (1/(-kappa)) * (Q12 + kappa*Q23) * fi2 * (-rim(k)^(kappa) + rim(k+1)^(-kappa));
+% e0 indipendent intermediate terms
+a1 = -(1/2) * (Q22 - (fi7*(Q12+Q23)*kappa^-1)) * [-rim(k)^2; rim(k+1)^2];
+a2 = (1/2) * (Q12+Q23) * kappa^-1 * sigR * [-rim(k)^2; rim(k+1)^2];
+a3 = (1/4) * mat.rho{b} * w^2 * (fi5*(Q12+3*Q23)*kappa^-1 + fi6*(Q12+3*Q23))*[-rim(k)^4; rim(k+1)^4];
+a4 = (1/3) * (Q22 - fi6*(Q12-2*Q23)*kappa^-1) * [-rim(k)^3; rim(k+1)^3]; % * e1
+a5 = (1/2) * fi4 * (Q12 + Q23) * [-rim(k)^2; rim(k+1)^2];
+a6 = (1/3) * fi3 * (Q12 + 2*Q23) * [-rim(k)^3; rim(k+1)^3];
 
-msig = (-3/4) * mat.rho{k} * w^2 * fi0 * (Q12 + Q23)* (-rim(k)^4 + rim(k+1)^4);
-m1 = (1/3) * (fi3*(Q12 + 2*Q23) + Q22) * (-rim(k)^3 + rim(k+1)^3);
-m0 = (1/2) * (fi4*(Q12 + Q23) + Q22) * (-rim(k)^2 + rim(k+1)^2);
-mCT = (1/(kappa+1)) * (Q12 + kappa*Q23) * fi1 * (-rim(k)^(kappa+1) + rim(k+1)^(-kappa+1))...
-      + (1/(-kappa+1)) * (Q12 + kappa*Q23) * fi2 * (-rim(k)^(kappa+1) + rim(k+1)^(-kappa+1));
+% e1 intermediate terms
+b1 = (1/4) * (Q22 - fi6*(Q12 - 2*Q23)*kappa^-1) * [-rim(k)^4; rim(k+1)^4];
+b2 = (1/3) * (Q12+Q23) * kappa^-1 * sigR *[-rim(k)^3; rim(k+1)^3];
+b3 = (1/5) * mat.rho{b} * w^2 * (fi5*(Q12+3*Q23)*kappa^-1 + fi6*(Q12+3*Q23)) * [-rim(k)^5; rim(k+1)^5];
+b4 = (1/3) * (Q22 - fi7*(Q12+Q23)*kappa^-1)*[-rim(k)^3; rim(k+1)^3]; % * e0
+b5 = (1/3) * fi4 * (Q12+Q23)*[-rim(k)^3; rim(k+1)^3];
+b6 = (1/4) * (Q12 + 2*Q23)*[-rim(k)^4; rim(k+1)^4];
 
-e0_inter = f1 / (m1*f0 - m0*f1);
-e0 = e0_inter * (msig - (m1/f1) * fCT + mCT);
-
-e1 = (f1^-1) * (-fsig - f0*e0 - fCT);
+e1 = (1/(1-(b4*a4)/(b1*a1))) * ((1/b1) * ((b2 + b3 + b5 + b6) + (b4/a1)*(a2 + a3 + a5 + a6)));
+e0 = (1/a1) * (a2 + a3 + a4*e1 + a5 + a6);
