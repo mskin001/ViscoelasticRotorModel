@@ -60,7 +60,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
       z2 = z^-kappa - z^kappa;
 
       % Axial strain coefficients
-      [e0, e1] = axialStrainConstants(b,k, kappa);
+      [e0, e1] = axialStrainConstants(sigb,b,k, kappa);
 
       % Local stiffness matrix
       kMat = (1/z2) * [kappa*z1*Q33-z2*Q13, -2*kappa*Q33;
