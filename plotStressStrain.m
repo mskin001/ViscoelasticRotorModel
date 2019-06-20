@@ -43,8 +43,8 @@ if strcmp(plotWhat.custom1, 'yes')
   plot(nr,srRad,'b--s', 'LineWidth', 1)
   plot(nr,srHoop, 'r--o', 'LineWidth', 1)
   
-  axialStr = figure();
-  plot(rArr,sArr(2,:,1),'bo-');
+%   axialStr = figure();
+%   plot(rArr,sArr(2,:,1),'bo-');
 %   axis([0.5, 1, -1, 3]);
   grid on
   xlabel('r/r_{min}')

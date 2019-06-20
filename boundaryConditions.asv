@@ -72,8 +72,8 @@ elseif length(w) == 1 % Second part for pe and ve simulations
     Fb(end) = rim(end)*sigb(end);
     % Displacement at the inner and outer radius of each rim
     F = Fb + Fw + Fd;
-    Fz = 0.26 * F;
-    U(b,:) = K \ (F - Fz);
+    F
+    U(b,:) = K \ (Fb + Fw + Fd);
 
     % Reset matrix values
     K = K .* 0;
