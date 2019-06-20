@@ -47,9 +47,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
 
       % intermediate variables for calculating the stiffness matrix
       fi0 = 1/(Q33 * (9 - kappa^2));
-      fi3 = (Q12 - 2*Q23) / (4*Q33 - Q11);
-      fi4 = (Q12 - Q23) / (Q33 - Q11);
-      fi5 = (Q31 + 3*Q33)*fi0;
+      fi3 = (3 * Q33 + Q13) / (Q33 * (9 - kappa^2));
 
       z = rim(k)/rim(k+1);
       z1 = z^-kappa + z^kappa;
@@ -64,17 +62,9 @@ elseif length(w) == 1 % Second part for pe and ve simulations
 
       fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
       uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
-      u0 = fi4 * [rim(k); rim(k+1)];
-      u1 = fi3 * [rim(k)^2; rim(k+1)^2];
       
       fw = -fsig + kMat*uw;
       Fw(k:k+1) = Fw(k:k+1) + fw;
-      
-      fe0 = -f0 + kMat*u0;
-      F0(k:k+1) = F0(k:k+1) + fe0;
-      
-      fe1 = -f1 + kMat*u1;
-      F1(k:k+1) = F1(k:k+1) + fe1;
       
       Fd(k:k+1) = Fd(k:k+1) + kMat*[0;delta(k)];
     end
@@ -83,7 +73,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
     Fb(1) = -rim(1)*sigb(1);
     Fb(end) = rim(end)*sigb(end);
     % Displacement at the inner and outer radius of each rim
-    U(b,:) = K \ (Fb + Fw + F0 + F1 + Fd);
+    U(b,:) = K \ (Fb + Fw + Fd);
 
     % Reset matrix values
     K = K .* 0;
