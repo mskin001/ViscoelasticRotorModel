@@ -40,48 +40,36 @@ if length(w) > 1 % First part is for qdve simulation
 elseif length(w) == 1 % Second part for pe and ve simulations
   for b = 1:vari
     for k = 1:length(rim)-1
-      Q11 = mat.Q{b,k}(1,1);
-      Q12 = mat.Q{b,k}(1,2);
-      Q13 = mat.Q{b,k}(1,3);
-      Q23 = mat.Q{b,k}(2,3);
-      Q33 = mat.Q{b,k}(3,3);
-      kappa = sqrt(Q11/Q33);
-
-      % intermediate variables for calculating the stiffness matrix
-      fi0 = 1/(Q33 * (9 - kappa^2));
-      fi3 = (Q12 - 2*Q23) / (4*Q33 - Q11);
-      fi4 = (Q12 - Q23) / (Q33 - Q11);
-      fi5 = (Q13 + 3*Q33)*fi0;
-      fi6 = fi3 * (Q13 + 2*Q33) + Q23;
-      fi7 = fi4 * (Q13 + Q33) + Q23;
-
+       
+      [Q, kappa, fi] = findMatPropConsts(b,k);
+      
       z = rim(k)/rim(k+1);
       z1 = z^-kappa + z^kappa;
       z2 = z^-kappa - z^kappa;
 
       % Axial strain coefficients
-      [e0, e1] = axialStrainConstants(sigb,b,k, kappa);
+   [e0, e1] = axialStrainConstants(sigb,b,k, kappa);
 
       % Local stiffness matrix
-      kMat = (1/z2) * [kappa*z1*Q33-z2*Q13, -2*kappa*Q33;
-                      -2*kappa*Q33, kappa*z1*Q33+z2*Q13];
+      kMat = (1/z2) * [kappa*z1*Q(3,3)-z2*Q(1,3), -2*kappa*Q(3,3);
+                      -2*kappa*Q(3,3), kappa*z1*Q(3,3)+z2*Q(1,3)];
 
       % Global stiffness matrix for the entire
       K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
 
-      fsig = -(mat.rho{k})*w^2*fi5*[-rim(k)^3; rim(k+1)^3];
-      uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
-      u0 = fi4 * [rim(k); rim(k+1)];
-      u1 = fi3 * [rim(k)^2; rim(k+1)^2];
+      fsig = -(mat.rho{k})*w^2*fi(6)*[-rim(k)^3; rim(k+1)^3];
+      uw = -(mat.rho{k})*w^2*fi(2)*[rim(k)^3; rim(k+1)^3];
+      u0 = fi(5) * [rim(k); rim(k+1)];
+      u1 = fi(4) * [rim(k)^2; rim(k+1)^2];
 
       fw = -fsig + kMat*uw;
       Fw(k:k+1) = Fw(k:k+1) + fw;
 
-      f0 = fi7 * [-rim(k); rim(k+1)]*e0;
+      f0 = fi(8) * [-rim(k); rim(k+1)]*e0;
       fe0 = -f0 + kMat*u0;
       F0(k:k+1) = F0(k:k+1) + fe0;
 
-      f1 = fi6 * [-rim(k)^2; rim(k+1)^2] * e1;
+      f1 = fi(7) * [-rim(k)^2; rim(k+1)^2] * e1;
       fe1 = -f1 + kMat*u1;
       F1(k:k+1) = F1(k:k+1) + fe1;
 

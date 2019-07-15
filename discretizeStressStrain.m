@@ -31,29 +31,17 @@ setappdata(prog,'Canceling',0);
 
 if length(w) > 1
 % Under Construction
-
 elseif length(w) == 1
   for b = 1:vari
     for k = 1:length(rim)-1
-      Q11 = mat.Q{b,k}(1,1);
-      Q12 = mat.Q{b,k}(1,2);
-      Q13 = mat.Q{b,k}(1,3);
-      Q23 = mat.Q{b,k}(2,3);
-      Q33 = mat.Q{b,k}(3,3);
-      kappa = sqrt(Q11/Q33); % intermediate variable of stiffness ratio
-
-      % intermediate variables for calculating the stiffness matrix
-      fi0 = 1/(Q33 * (9 - kappa^2));
-      fi1 = 1/(Q13 + (kappa * Q33));
-      fi2 = 1/(Q13 - (kappa * Q33));
-      fi3 = (Q12 - 2*Q23)/(4*Q33 - Q11);
-      fi4 = (Q12 - Q23)/(Q33 - Q13);
+      [~, kappa, fi] = findMatPropConsts(b,k);
+      
       % Calculate absolute displacement at the inner and outer surface of each rim
       u = [U(b,k); U(b,k+1) - delta(k)];
-      iota = diag([fi1,fi2]);
-      uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
-      u0 = fi4*[rim(k); rim(k+1)];
-      u1 = fi3*[rim(k)^2; rim(k+1)];
+      iota = diag([fi(2),fi(3)]);
+      uw = -mat.rho{k}*w^2*fi(1)*[rim(k)^3; rim(k+1)^3];
+      u0 = fi(5)*[rim(k); rim(k+1)];
+      u1 = fi(4)*[rim(k)^2; rim(k+1)];
       G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
       C = (G*iota)\(u - uw - u0 - u1);
 
@@ -64,14 +52,14 @@ elseif length(w) == 1
       rArr(rvstart:rvend) = rv;
 
       % Calculate discrete displacement vector
-      dv = -mat.rho{k}*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa...
-           +fi3*e1*rv.^2 + fi4*e0*rv;
+      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(1)*fi(2)*rv.^kappa + C(2)*fi(3)*rv.^-kappa...
+           +fi(4)*e1*rv.^2 + fi(5)*e0*rv;
       uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
       % Strain
       ep1 = dv ./ rv;
       ep2 = e0 + e1*rv;
-      ep3 = -3*mat.rho{k}*w^2*fi0*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
+      ep3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*(C(1)*fi(2)*rv.^(kappa-1) - C(2)*fi(3)*rv.^(-kappa-1));
       ep4 = zeros(size(ep1));
       eArr = [ep1; ep2; ep3; ep4]; % strain in each direction [hoop, axial, raidal, shear]
 
