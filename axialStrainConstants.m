@@ -1,8 +1,8 @@
-function [e0, e1] = axialStrainConstants()
+function [e0, e1] = axialStrainConstants(sigb)
 
 global mat rim w vari;
 
-syms r eb ea;
+syms r eb ea cOne cTwo;
 F = 0;
 M = 0;
 
@@ -10,7 +10,17 @@ for b = 1:vari
   for k = 1:length(rim)-1
     [Q, kappa, fi] = findMatPropConsts(b,k);
     
-    ur = -mat.rho{k}*w^2*fi(1)*r^3 + 10^12*fi(2)*r^kappa + 10^12*fi(3)*r^-kappa + fi(4)*eb*r^2 + fi(5)*ea*r;
+    %Find C1 and C2 constants from radial boundary conditions
+    sigR0 = -mat.rho{k}*w^2*fi(6)*r^2 + cOne*r^(kappa-1) + cTwo*r^(-kappa-1) + 2*fi(4)*eb*r...
+      +fi(5)*ea - sigb(1);
+    sigR1 = -mat.rho{k}*w^2*fi(6)*r^2 + cOne*r^(kappa-1) + cTwo*r^(-kappa-1) + 2*fi(4)*eb*r...
+      +fi(5)*ea - sigb(2);
+    C1 = solve(sigR0,cOne);
+    sigR1 = subs(sigR1,cOne,C1);
+    C2 = solve(sigR1,cTwo);
+    C1 = subs(C1,cTwo,C2);
+    
+    ur = -mat.rho{k}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*eb*r^2 + fi(5)*ea*r;
 
     eTheta = ur/r;
     er = diff(ur,r);

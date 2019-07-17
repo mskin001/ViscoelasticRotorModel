@@ -39,7 +39,7 @@ if length(w) > 1 % First part is for qdve simulation
   % Under construction
 elseif length(w) == 1 % Second part for pe and ve simulations
   % Axial strain coefficients
-  [e0,e1] = axialStrainConstants();
+  [e0,e1] = axialStrainConstants(sigb);
 %   e0 = -3;
 %   e1 = -3;
   for b = 1:vari
