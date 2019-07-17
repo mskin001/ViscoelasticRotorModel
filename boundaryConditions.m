@@ -38,6 +38,10 @@ setappdata(prog,'Canceling',0);
 if length(w) > 1 % First part is for qdve simulation
   % Under construction
 elseif length(w) == 1 % Second part for pe and ve simulations
+  % Axial strain coefficients
+  [e0,e1] = axialStrainConstants();
+%   e0 = -3;
+%   e1 = -3;
   for b = 1:vari
     for k = 1:length(rim)-1
        
@@ -45,10 +49,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
       
       z = rim(k)/rim(k+1);
       z1 = z^-kappa + z^kappa;
-      z2 = z^-kappa - z^kappa;
-
-      % Axial strain coefficients
-      [e0] = axialStrainConstants(b,k);
+      z2 = z^-kappa - z^kappa;      
 
       % Local stiffness matrix
       kMat = (1/z2) * [kappa*z1*Q(3,3)-z2*Q(1,3), -2*kappa*Q(3,3);
@@ -58,7 +59,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
       K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
 
       fsig = -(mat.rho{k})*w^2*fi(6)*[-rim(k)^3; rim(k+1)^3];
-      uw = -(mat.rho{k})*w^2*fi(2)*[rim(k)^3; rim(k+1)^3];
+      uw = -(mat.rho{k})*w^2*fi(1)*[rim(k)^3; rim(k+1)^3];
       u0 = fi(5) * [rim(k); rim(k+1)];
       u1 = fi(4) * [rim(k)^2; rim(k+1)^2];
 
@@ -85,6 +86,8 @@ elseif length(w) == 1 % Second part for pe and ve simulations
     % Reset matrix values
     K = K .* 0;
     Fw = Fw .* 0;
+    F1 = F1 .* 0;
+    F0 = F0 .* 0;
     Fb = Fb .* 0;
     Fd = Fd .* 0;
 
