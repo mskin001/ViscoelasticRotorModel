@@ -24,7 +24,7 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-1.6e8, 0];
+sigb = [-0.78e8, 0];
 mats = {'Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
