@@ -1,45 +1,52 @@
-function [e0, e1] = axialStrainConstants(sigb)
+function [e0,e1] = axialStrainConstants(b)
 
-global mat rim w vari;
+global mat rim w;
 
-syms r eb ea cOne cTwo;
-F = 0;
-M = 0;
+B = zeros(3,3);
+fw = zeros(2,1);
+f1 = fw;
+f0 = fw;
+mw = fw;
+m1 = fw;
+m0 = fw;
 
-for b = 1:vari
-  for k = 1:length(rim)-1
-    [Q, kappa, fi] = findMatPropConsts(b,k);
-    
-    %Find C1 and C2 constants from radial boundary conditions
-    sigR0 = -mat.rho{k}*w^2*fi(6)*rim(k)^2 + cOne*rim(k)^(kappa-1) + cTwo*rim(k)^(-kappa-1) + 2*fi(4)*eb*rim(k)...
-      +fi(5)*ea - sigb(1);
-    sigR1 = -mat.rho{k}*w^2*fi(6)*rim(k+1)^2 + cOne*rim(k+1)^(kappa-1) + cTwo*rim(k+1)^(-kappa-1) + 2*fi(4)*eb*rim(k+1)...
-      +fi(5)*ea - sigb(2);
-    C1 = solve(sigR0,cOne);
-    sigR1 = subs(sigR1,cOne,C1);
-    C2 = solve(sigR1,cTwo);
-    C1 = subs(C1,cTwo,C2);
-    
-    ur = -mat.rho{k}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*eb*r^2 + fi(5)*ea*r;
+[~, kone, fione] = findMatPropConsts(b,1);
+[~, kend, fiend] = findMatPropConsts(b,length(rim)-1);
 
-    eTheta = ur/r;
-    er = diff(ur,r);
+fw(1) = - 0.25 * fione(9) * mat.rho{1} * w^2 * -rim(1)^4;
+fw(2) = - 0.25 * fiend(9) * mat.rho{end} * w^2 * rim(end)^4;
 
-    sigZ = Q(2,1)*eTheta + Q(2,2)*eb*r + Q(2,2)*ea + Q(2,3)*er;
-    zr = sigZ*r;
-    m = sigZ*r^2;
+f1(1) = (1/3) * fione(12) * -rim(1)^3;
+f1(2) = (1/3) * fiend(12) * rim(end)^3;
 
-    fz = int(zr,r,rim(k),rim(k+1));
-    mz = int(m,r,rim(k),rim(k+1));
+f0(1) = 0.5 * fione(13) * -rim(1)^2;
+f0(2) = 0.5 * fiend(13) * rim(end)^2;
 
-    F = F + fz;
-    M = M + mz;
-  end
-end
+mw(1) = - (1/5) * fione(9) * mat.rho{1} * w^2 * -rim(1)^5;
+mw(2) = - (1/5) * fiend(9) * mat.rho{1} * w^2 * rim(end)^5;
 
-e0 = solve(F,ea);
-M = subs(M,ea,e0);
-e1 = solve(M,eb);
-e0 = subs(e0,eb,e1);
-e1 = double(e1);
-e0 = double(e0);
+m1(1) = 0.24 * fione(12) * -rim(1)^4;
+m1(2) = 0.24 * fiend(12) * rim(end)^4;
+
+m0(1) = (1/3) * fione(13) * -rim(1)^3;
+m0(2) = (1/3) * fiend(13) * rim(end)^3;
+
+is = [-1 0; 0 1];
+Gf = [rim(1)^(kone+1) rim(1)^(-kone+1); rim(end)^(kend+1) rim(end)^(-kend+1)];
+Gm = [rim(1)^(kone+2) rim(1)^(-kone+2); rim(end)^(kend+2) rim(end)^(-kend+2)];
+Kf = [1/(kone+1); 1/(-kend+1)];
+Km = [1/(kone+2); 1/(-kend+2)];
+
+A = is * Gf * (Kf * (Km.^-1)') * Gm^-1 * is^-1;
+
+alpha = A*m1 - f1;
+beta = A*m0 - f0;
+omega = fw - A*mw;
+
+e1 = (omega(2)*beta(1) - omega(1)*beta(2))/(beta(1)*alpha(2) - beta(2)*alpha(1));
+e0 = omega(1)/beta(1) - (alpha(1)*e1)/beta(1);
+
+
+
+
+
