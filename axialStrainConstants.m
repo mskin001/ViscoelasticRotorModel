@@ -1,4 +1,4 @@
-function [e0,e1] = axialStrainConstants(b)
+function [e0,e1] = axialStrainConstants(b,k,C1,C2)
 
 global mat rim w;
 
