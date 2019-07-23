@@ -24,8 +24,8 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-0.78e8, 0];
-mats = {'Glass_Epoxy_Ha1999.mat'};
+sigb = [-0.778e8, 0];
+mats = {'E-Glass_Ha2006.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
@@ -213,18 +213,21 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-[~, ~, ~, ~] = boundaryConditions(sigb, delta);
+% [~, ~, ~, ~] = boundaryConditions(sigb, delta);
+% 
+% if vari == -1
+%   return
+% end
+% fprintf('Calculate Boundary Conditions: Complete\n')
+%% Find Constants
+[C1,C2] = findConstants(sigb);
 
-if vari == -1
-  return
-end
-fprintf('Calculate Boundary Conditions: Complete\n')
 %% -----------------------------------------------------------------------------
 % Calculate discrete displacement, stain, and stress for each rim ~ here is
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
-[~] = discretizeStressStrain(rdiv, delta);
+[~] = discretizeStressStrain(rdiv, delta, C1, C2);
 
 if vari == -1
   return

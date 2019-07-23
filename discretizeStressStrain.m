@@ -1,4 +1,4 @@
-function [C] = discretizeStressStrain(rdiv, delta)
+function [C] = discretizeStressStrain(rdiv, delta, C1, C2)
 % This function calculates a discrete vector of stress and strain in each rim of
 % the rotor. It uses the boundary conditions for each rim caulculated in the
 % function boundaryConditions to find the C constants. These are then used to
@@ -40,18 +40,19 @@ elseif length(w) == 1
       Q23 = mat.Q{b,k}(2,3);
       Q33 = mat.Q{b,k}(3,3);
       kappa = sqrt(Q11/Q33); % intermediate variable of stiffness ratio
-
+      Q = mat.Q{b,k};
       % intermediate variables for calculating the stiffness matrix
       fi0 = 1/(Q33 * (9 - kappa^2));
       fi1 = 1/(Q13 + (kappa * Q33));
       fi2 = 1/(Q13 - (kappa * Q33));
-
+      f4 = (Q(1,2)-Q(2,3))/(Q(3,3)-Q(1,1));
+      f7 = f4*(Q(3,1)+Q(3,3))+Q(3,2);
       % Calculate absolute displacement at the inner and outer surface of each rim
-      u = [U(b,k); U(b,k+1) - delta(k)];
-      iota = diag([fi1,fi2]);
-      uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
-      G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
-      C = (G*iota)\(u - uw);
+%       u = [U(b,k); U(b,k+1) - delta(k)];
+%       iota = diag([fi1,fi2]);
+%       uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
+%       G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
+%       C = (G*iota)\(u - uw);
 
       % Discretize radius vector
       rv = linspace(rim(k), rim(k+1), rdiv);
@@ -60,6 +61,7 @@ elseif length(w) == 1
       rArr(rvstart:rvend) = rv;
 
       % Calculate discrete displacement vector
+      C = [C1,C2];
       dv = -mat.rho{k}*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
       uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
