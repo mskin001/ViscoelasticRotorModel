@@ -43,7 +43,8 @@ elseif length(w) == 1 % Second part for pe and ve simulations
 %   e0 = -3;
 %   e1 = -3;
   for b = 1:vari
-    [e0,e1] = axialStrainConstants(b);
+    [e0,e1] = axialStrainConstants(sigb,b);
+    
     for k = 1:length(rim)-1
        
       [Q, kappa, fi] = findMatPropConsts(b,k);
