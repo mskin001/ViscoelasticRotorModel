@@ -60,7 +60,11 @@ C1 = subs(C1,c2,C2);
 
 C2 = simplify(C2);
 C1 = simplify(C1);
+sigr = si*ri^2 + C1*ri^(ki-1) + C2*ri^(-ki-1) + f6i*e1*ri + f7i*e0;
+testInner = simplify(sigr)
 
+sigr2 = so*ro^2 + C1*ro^(ko-1) + C2*ro^(-ko-1) + f6o*e1*ro + f7o*e0;
+testOuter = simplify(sigr2)
 [~, ki, fi] = findMatPropConsts(b,1);
 [~, ko, fo] = findMatPropConsts(b,(length(rim)-1));
 ri = rim(1);
@@ -77,16 +81,26 @@ f7o = fo(8);
 C1 = subs(C1);
 C2 = subs(C2);
 
-Fz = Fw + F1 + F0 + Fc1*C1 + Fc2*C2;
-Mz = Mw + M1 + M0 + Mc1*C1 + Mc2*C2;
+
+
+Fz = Fw + F1*e1 + F0*e0 + Fc1*C1 + Fc2*C2;
+Mz = Mw + M1*e1 + M0*e0 + Mc1*C1 + Mc2*C2;
 
 e1 = solve(Fz,e1);
 Mz = subs(Mz);
 e0 = solve(Mz,e0);
 e1 = subs(e1);
 
-e0 = double(e0)
-e1 = double(e1)
+e0 = double(e0);
+e1 = double(e1);
+
+sigr = si*ri^2 + C1*ri^(ki-1) + C2*ri^(-ki-1) + f6i*e1*ri + f7i*e0;
+sigr = subs(sigr);
+testInner = double(sigr)
+
+sigr2 = so*ro^2 + C1*ro^(ko-1) + C2*ro^(-ko-1) + f6o*e1*ro + f7o*e0;
+sigr2 = subs(sigr2);
+testOuter = double(sigr2)
 
 
 
