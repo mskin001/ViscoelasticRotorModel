@@ -44,7 +44,7 @@ plotWhat.custom1 = 'no';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'no';
+plotWhat.radDis = 'yes';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
@@ -52,7 +52,7 @@ plotWhat.radStr = 'yes';         % Radial stress v. radius plot
 
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
 
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
@@ -149,7 +149,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [1, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
+  tArr = [1, 1*10e5, 1*10e10]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')
@@ -207,6 +207,8 @@ end
 
 delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
+%% Find Constants
+[E0,E1,C1,C2] = findAxialStrainCoeff(sigb);
 %% ----------------------------------------------------------------------------
 % Calculate displacement magnitude at the inner and outer surface of each rim
 % these are used as boundary conditions to find C. ~ is used to disregard
@@ -214,13 +216,12 @@ fprintf('Create Material Property Matrices: Complete\n')
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
 % [~, ~, ~, ~] = boundaryConditions(sigb, delta);
-% 
+
 % if vari == -1
 %   return
 % end
 % fprintf('Calculate Boundary Conditions: Complete\n')
-%% Find Constants
-[E0,E1,C1,C2] = findAxialStrainCoeff(sigb);
+
 %% -----------------------------------------------------------------------------
 % Calculate discrete displacement, stain, and stress for each rim ~ here is
 % used to the [C] matrix output. This is useful for debugging and
