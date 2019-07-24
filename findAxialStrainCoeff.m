@@ -42,3 +42,5 @@ InnerStress = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + C1*rim(1)^(kappa-1) + C2*rim(1)^(
   + fi(7)*E1*rim(1) + fi(8)*E0 - sigb(1)
 OuterStress = -mat.rho{1}*w^2*fi(6)*rim(end)^2 + C1*rim(end)^(kappa-1) + C2*rim(end)^(-kappa-1)...
   + fi(7)*E1*rim(end) + fi(8)*E0 - sigb(2)
+
+
