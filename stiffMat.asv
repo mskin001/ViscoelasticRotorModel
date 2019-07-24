@@ -7,7 +7,7 @@ E22 = mstiff(2);
 G12 = mstiff(3);
 G23 = mstiff(4); % Only used if nu23 is not specified
 nu12 = mstiff(5);
-nu23 = 0.36; % E22/(2*G23)-1;
+nu23 = 0.26; % E22/(2*G23)-1;
 
 if ~strcmp(compFunc,'no')
   out = compFunc(mstiff);
@@ -40,9 +40,9 @@ end
 %% -----------------------------------------------------------------------------
 % Assembling the compliance matrix and inversion to stiffness matrix       
 % ------------------------------------------------------------------------------ 
-S = [ S11      -nu12*S22 -nu12*S22 0;
+S = [ S11      -nu12*S22 -nu12*S33 0;
      -nu12*S22 S22       -nu23*S33 0;
-     -nu12*S22 -nu23*S33 S33       0;
+     -nu12*S33 -nu23*S33 S33       0;
      0         0         0         G12];
  
 Q = inv(S);

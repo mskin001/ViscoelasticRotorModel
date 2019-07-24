@@ -24,7 +24,7 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-.778e8, 0];
+sigb = [0, 0];
 mats = {'Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
@@ -57,7 +57,6 @@ plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
                                  %   0 is fastest
-
 %% -----------------------------------------------------------------------------
 % Start Program
 % ------------------------------------------------------------------------------
@@ -149,7 +148,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [3600, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
+  tArr = [1, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')
