@@ -25,7 +25,7 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
 sigb = [-0.778e8, 0];
-mats = {'E-Glass_Ha2006.mat'};
+mats = {'Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
@@ -220,8 +220,8 @@ fprintf('Create Material Property Matrices: Complete\n')
 % end
 % fprintf('Calculate Boundary Conditions: Complete\n')
 %% Find Constants
-[C1,C2] = findConstants(sigb);
-
+% [C1,C2] = findConstants(sigb);
+[E0,E1,C1,C2] = findAxialStrainCoeff(sigb);
 %% -----------------------------------------------------------------------------
 % Calculate discrete displacement, stain, and stress for each rim ~ here is
 % used to the [C] matrix output. This is useful for debugging and
