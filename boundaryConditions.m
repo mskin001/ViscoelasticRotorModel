@@ -70,8 +70,9 @@ elseif length(w) == 1 % Second part for pe and ve simulations
     % Force from external pressure applied to inner and outer surface of the rim
     Fb(1) = -rim(1)*sigb(1);
     Fb(end) = rim(end)*sigb(end);
+    Fa = 
     % Displacement at the inner and outer radius of each rim
-    U(b,:) = K \ (Fb + Fw + Fd);
+    U(b,:) = K \ (Fb + Fw + Fd + Fa);
 
     % Reset matrix values
     K = K .* 0;
