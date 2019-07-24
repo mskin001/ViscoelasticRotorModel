@@ -207,21 +207,24 @@ end
 
 delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
+
+%% Find Constants
+% [C1,C2] = findConstants(sigb);
+[E0,E1,C1,C2] = findAxialStrainCoeff(sigb);
+
 %% ----------------------------------------------------------------------------
 % Calculate displacement magnitude at the inner and outer surface of each rim
 % these are used as boundary conditions to find C. ~ is used to disregard
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-% [~, ~, ~, ~] = boundaryConditions(sigb, delta);
-% 
-% if vari == -1
-%   return
-% end
-% fprintf('Calculate Boundary Conditions: Complete\n')
-%% Find Constants
-% [C1,C2] = findConstants(sigb);
-[E0,E1,C1,C2] = findAxialStrainCoeff(sigb);
+[~, ~, ~, ~] = boundaryConditions(sigb, delta);
+
+if vari == -1
+  return
+end
+fprintf('Calculate Boundary Conditions: Complete\n')
+
 %% -----------------------------------------------------------------------------
 % Calculate discrete displacement, stain, and stress for each rim ~ here is
 % used to the [C] matrix output. This is useful for debugging and
