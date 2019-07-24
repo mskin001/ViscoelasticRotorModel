@@ -15,13 +15,13 @@ C2 = solve(sOuter,c2);
 C1 = subs(C1,c2,C2);
 
 %% Find axial strain constants
-u = -mat.rho{1}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(2)*r^-kappa + fi(4)*e1*r^2 ...
+u = -mat.rho{1}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*e1*r^2 ...
       + fi(5)*e0;
 eT = u/r;
 eR = diff(u,r);
 eZ = e0 + e1*r;
 
-sigZ = Q(2,1)*eT + Q(2,2)*eZ * Q(2,3)*eR;
+sigZ = Q(2,1)*eT + Q(2,2)*eZ + Q(2,3)*eR;
 tempF = sigZ*r;
 f = int(tempF,r,rim(1),rim(end));
 E1 = solve(f,e1);
@@ -29,12 +29,10 @@ sigZ = subs(sigZ,e1,E1);
 tempM = sigZ * r^2;
 m = int(tempM,r,rim(1),rim(end));
 E0= solve(m,e0);
-
-% E0 = subs(E0,e1,E1);
-% E1 = subs(E1,e0,E0);
-
 E0 = double(E0)
+
+E1 = subs(E1,e0,E0);
 E1 = double(E1)
 
-C1 = subs(C1,{e0,e1},[E0,E1])
-C2 = subs(C2,{e0,e1},[E0,E1])
+C1 = double(subs(C1,{e0,e1},[E0,E1]))
+C2 = double(subs(C2,{e0,e1},[E0,E1]))
