@@ -5,11 +5,11 @@ global mat rim w
 
 syms c1 c2 e0 e1 r
 %% Find constants from boundaries
-sInner = -mat.rho{1}*w^2*fi(5)*rim(1)^2 + c1*rim(1)^(kappa-1) + c2*rim(1)^(-kappa-1)...
+sInner = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + c1*rim(1)^(kappa-1) + c2*rim(1)^(-kappa-1)...
           + fi(7)*e1*rim(1) + fi(8)*e0 - sigb(1);
 C1 = solve(sInner,c1);
 
-sOuter = -mat.rho{1}*w^2*fi(5)*rim(end)^2 + C1*rim(end)^(kappa-1) + c2*rim(end)^(-kappa-1)...
+sOuter = -mat.rho{1}*w^2*fi(6)*rim(end)^2 + C1*rim(end)^(kappa-1) + c2*rim(end)^(-kappa-1)...
           + fi(7)*e1*rim(end) + fi(8)*e0 - sigb(2);
 C2 = solve(sOuter,c2);
 C1 = subs(C1,c2,C2);
@@ -29,10 +29,16 @@ sigZ = subs(sigZ,e1,E1);
 tempM = sigZ * r^2;
 m = int(tempM,r,rim(1),rim(end));
 E0= solve(m,e0);
-E0 = double(E0)
+E0 = double(E0);
 
 E1 = subs(E1,e0,E0);
-E1 = double(E1)
+E1 = double(E1);
 
-C1 = double(subs(C1,{e0,e1},[E0,E1]))
-C2 = double(subs(C2,{e0,e1},[E0,E1]))
+C1 = double(subs(C1,{e0,e1},[E0,E1]));
+C2 = double(subs(C2,{e0,e1},[E0,E1]));
+
+%% Check
+InnerStress = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + C1*rim(1)^(kappa-1) + C2*rim(1)^(-kappa-1)...
+  + fi(7)*E1*rim(1) + fi(8)*E0 - sigb(1)
+OuterStress = -mat.rho{1}*w^2*fi(6)*rim(end)^2 + C1*rim(end)^(kappa-1) + C2*rim(end)^(-kappa-1)...
+  + fi(7)*E1*rim(end) + fi(8)*E0 - sigb(2)
