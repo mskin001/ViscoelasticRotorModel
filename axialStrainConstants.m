@@ -78,8 +78,8 @@ f7i = fi(8);
 f6o = fo(7);
 f7o = fo(8);
 
-C1 = subs(C1);
-C2 = subs(C2);
+C1 = subs(C1)
+C2 = subs(C2)
 
 
 

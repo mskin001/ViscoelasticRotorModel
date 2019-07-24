@@ -59,7 +59,8 @@ elseif length(w) == 1
       % Strain
       ep1 = dv ./ rv;
       ep2 = e0 + e1*rv;
-      ep3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*(C(1)*fi(2)*rv.^(kappa-1) - C(2)*fi(3)*rv.^(-kappa-1));
+      ep3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(1)*fi(2)*rv.^(kappa-1) ...
+              - kappa*C(2)*fi(3)*rv.^(-kappa-1) + 2*fi(4)*e1*rv + fi(5)*e0;
       ep4 = zeros(size(ep1));
       eArr = [ep1; ep2; ep3; ep4]; % strain in each direction [hoop, axial, raidal, shear]
 
