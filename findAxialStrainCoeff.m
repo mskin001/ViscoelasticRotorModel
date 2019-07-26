@@ -26,7 +26,7 @@ for b = 1:vari
   srInner = subs(SR) - sigb(1);
   C1 = solve(srInner,c1);
 
-  [~, kappa, fi] = findMatPropConsts(b,length(rim)-1);
+  [Q, kappa, fi] = findMatPropConsts(b,length(rim)-1);
   r = rim(end);
   fi1 = fi(1);
   fi2 = fi(2);
@@ -56,7 +56,7 @@ for b = 1:vari
   C(b,:) = [C1;C2];
   
   [Q, kappa, fi] = findMatPropConsts(b,1);
-  r = rim(1);
+  r = rim(end);
   fi1 = fi(1);
   fi2 = fi(2);
   k = kappa;
@@ -66,7 +66,7 @@ for b = 1:vari
   c1 = C(b,1);
   c2 = C(b,2);
   ez = E(b);
-  srInner = double(subs(SR) - sigb(1))
+  srInner = double(subs(SR) - sigb(2))
 end
 
 %% Check

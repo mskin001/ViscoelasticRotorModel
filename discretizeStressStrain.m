@@ -34,7 +34,7 @@ if length(w) > 1
 elseif length(w) == 1
   for b = 1:vari
     for k = 1:length(rim)-1
-      [~, kappa, fi] = findMatPropConsts(1,1);
+      [~, kappa, fi] = findMatPropConsts(b,k);
 
       % Discretize radius vector
       rv = linspace(rim(k), rim(k+1), rdiv);
@@ -43,12 +43,12 @@ elseif length(w) == 1
       rArr(rvstart:rvend) = rv;
 
       % Calculate discrete displacement vector
-      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(b,1)*rv.^kappa + C(b,2)*rv.^-kappa + fi(2)*E(b)*rv;
+      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(b,1)*rv.^kappa + C(b,2)*rv.^-kappa + fi(2)*E(b);
       uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
       % Strain
       e1 = dv ./ rv;
-      e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(b,1)*fi(2)*rv.^(kappa-1) - kappa*C(b,2)*rv.^(-kappa-1) ...
+      e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(b,1)*rv.^(kappa-1) - kappa*C(b,2)*rv.^(-kappa-1) ...
               + fi(2)*E(b);
       e2 = ones(size(e1))*E(b); % no strain in the axial or shear directions
       e4 = zeros(size(e1));
@@ -56,6 +56,10 @@ elseif length(w) == 1
 
       % Stress
       stress = mat.Q{b,k} * eArr;
+%       sArr(1,rvstart:rvend,b) = e1*mat.Q{b,k}(1,1);
+%       sArr(2,rvstart:rvend,b) = e2*mat.Q{b,k}(2,2);
+%       sArr(3,rvstart:rvend,b) = e3*mat.Q{b,k}(3,3);
+%       sArr(4,rvstart:rvend,b) = e4*mat.Q{b,k}(4,4);
       sArr(:,rvstart:rvend,b) = stress;
     end
     
