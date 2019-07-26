@@ -6,12 +6,7 @@ function [Q, kappa, fi] = findMatPropConsts(b,k)
 global mat
 
 [r,c] = size(mat.Q{b,k});
-Q = zeros(r,c);
-for y = 1:r
-    for x = 1:c
-        Q(y,x) = mat.Q{b,k}(y,x);
-    end
-end
+Q = mat.Q{b,k};
 
 kappa = sqrt(Q(1,1)/Q(3,3));
 
