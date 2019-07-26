@@ -3,10 +3,15 @@ global mat rim w vari
 
 [Q, kappa, fi] = findMatPropConsts(1,1);
 
-syms c1 c2 e0 e1 r
+syms c1 c2 ez r
+u = -mat.rho{1}*w^2*fi(1)*r^3 + c1*r^kappa + c2*r^-kappa + fi(2)*ez*r;
+eT = u/r;
+eR = diff(u,r);
+
+SR = Q(1,3)*ez + Q(2,3)*eT + Q(3,3)*eR;
 %% Find constants from boundaries
-sInner = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + c1*rim(1)^(kappa-1) + c2*rim(1)^(-kappa-1)...
-          + fi(7)*e1*rim(1) + fi(8)*e0 - sigb(1);
+srInner = subs(SR,r,rim(1));
+sInner = srInner - sigb(1);
 C1 = solve(sInner,c1);
 
 [Q, kappa, fi] = findMatPropConsts(length(vari),1);
@@ -17,7 +22,7 @@ C1 = subs(C1,c2,C2);
 
 %% Find axial strain constants
 for b = 1:vari
-    
+
   [Q, kappa, fi] = findMatPropConsts(b,1);
   u = -mat.rho{1}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*e1*r^2 ...
         + fi(5)*e0;
