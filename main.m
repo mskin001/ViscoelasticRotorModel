@@ -208,7 +208,7 @@ end
 delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
 %% Find Constants
-[E0,E1,C1,C2] = findAxialStrainCoeff(sigb);
+[E,C] = findAxialStrainCoeff(sigb);
 %% ----------------------------------------------------------------------------
 % Calculate displacement magnitude at the inner and outer surface of each rim
 % these are used as boundary conditions to find C. ~ is used to disregard
