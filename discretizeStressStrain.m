@@ -47,19 +47,15 @@ elseif length(w) == 1
       uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
       % Strain
-      e1 = dv ./ rv;
+      e2 = dv ./ rv;
       e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(b,1)*rv.^(kappa-1) - kappa*C(b,2)*rv.^(-kappa-1) ...
               + fi(2)*E(b);
-      e2 = ones(size(e1))*E(b); % no strain in the axial or shear directions
+      e1 = ones(size(e3))*E(b);
       e4 = zeros(size(e1));
       eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]
 
       % Stress
       stress = mat.Q{b,k} * eArr;
-%       sArr(1,rvstart:rvend,b) = e1*mat.Q{b,k}(1,1);
-%       sArr(2,rvstart:rvend,b) = e2*mat.Q{b,k}(2,2);
-%       sArr(3,rvstart:rvend,b) = e3*mat.Q{b,k}(3,3);
-%       sArr(4,rvstart:rvend,b) = e4*mat.Q{b,k}(4,4);
       sArr(:,rvstart:rvend,b) = stress;
     end
     
