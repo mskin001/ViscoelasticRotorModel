@@ -57,8 +57,13 @@ elseif length(w) == 1
       eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]
 
       % Stress
-      stress = mat.Q{b,k} * eArr;
-      sArr(:,rvstart:rvend,b) = stress;
+%       stress = mat.Q{b,k} * eArr;
+      sArr(1,rvstart:rvend,b) = mat.Q{b,k}(1,1) * e1;
+      sArr(2,rvstart:rvend,b) = mat.Q{b,k}(2,2) * e2;
+      sArr(3,rvstart:rvend,b) = mat.Q{b,k}(3,3) * e3;
+      sArr(4,rvstart:rvend,b) = mat.Q{b,k}(4,4) * e4;
+      
+%       sArr(:,rvstart:rvend,b) = stress;
     end
     
     if getappdata(prog,'Canceling')

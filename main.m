@@ -24,7 +24,7 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-0.77e8, 0];
+sigb = [0, 0];
 mats = {'Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
@@ -40,19 +40,19 @@ vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
 plotWhat.rims = rim;
-plotWhat.custom1 = 'yes';
+plotWhat.custom1 = 'no';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'no';
+plotWhat.radDis = 'yes';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
-plotWhat.radStr = 'no';         % Radial stress v. radius plot
+plotWhat.radStr = 'yes';         % Radial stress v. radius plot
 
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
 
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
@@ -216,7 +216,7 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-[~, ~, ~, ~] = boundaryConditions(sigb, delta);
+% [~, ~, ~, ~] = boundaryConditions(sigb, delta);
 
 if vari == -1
   return
