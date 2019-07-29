@@ -17,9 +17,9 @@ if ~strcmp(compFunc,'no')
     S33 = S22;
     G12 = 1/G12;
   elseif length(out) == 2
-    S11 = 1/E11;
-    S22 = out(1);
-    S33 = S22;
+    S11 = out(1);
+    S22 = 1/E11;
+    S33 = S11;
     G12 = out(2); % This was specified for IM&_8552_Tzeng2001
   elseif length(out) == 3
     S11 = out(3);
@@ -40,8 +40,8 @@ end
 %% -----------------------------------------------------------------------------
 % Assembling the compliance matrix and inversion to stiffness matrix       
 % ------------------------------------------------------------------------------ 
-S = [ S11      -nu12*S11 -nu12*S11 0;
-     -nu12*S11 S22       -nu23*S33 0;
+S = [ S11      -nu12*S22 -nu12*S33 0;
+     -nu12*S22 S22       -nu23*S22 0;
      -nu12*S11 -nu23*S22 S33       0;
      0         0         0         G12];
  

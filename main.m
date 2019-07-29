@@ -16,7 +16,7 @@ global mat plotWhat
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
   % qdve = quasi-dynamic viscoelasticu
-st = 've';
+st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999

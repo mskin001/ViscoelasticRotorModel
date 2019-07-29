@@ -34,7 +34,7 @@ if length(w) > 1
 elseif length(w) == 1
   for b = 1:vari
     for k = 1:length(rim)-1
-      [~, kappa, fi] = findMatPropConsts(1,1);
+      [~, kappa, fi] = findMatPropConsts(b,k);
 
       % Discretize radius vector
       rv = linspace(rim(k), rim(k+1), rdiv);
@@ -43,15 +43,14 @@ elseif length(w) == 1
       rArr(rvstart:rvend) = rv;
 
       % Calculate discrete displacement vector
-      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(b,1)*fi(2)*rv.^kappa + C(b,2)*fi(3)*rv.^-kappa ...
-            + fi(4)*E(b,2)*rv.^2 + fi(5)*E(b,1)*rv;
+      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(b,1)*rv.^kappa + C(b,2)*rv.^-kappa + fi(2)*E(b);
       uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
       % Strain
-      e1 = dv ./ rv;
-      e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(b,1)*fi(2)*rv.^(kappa-1) - kappa*C(b,2)*fi(3)*rv.^(-kappa-1) ...
-              + 2*fi(4)*E(b,2)*rv + fi(5)*E(b,1);
-      e2 = E(b,1) + E(b,2)*rv; % no strain in the axial or shear directions
+      e2 = dv ./ rv;
+      e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(b,1)*rv.^(kappa-1) - kappa*C(b,2)*rv.^(-kappa-1) ...
+              + fi(2)*E(b);
+      e1 = ones(size(e3))*E(b);
       e4 = zeros(size(e1));
       eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]
 
