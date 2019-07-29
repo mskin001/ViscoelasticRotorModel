@@ -45,7 +45,7 @@ for b = 1:vari
   eT = u/r;
   eR = diff(u,r);
 
-  sigZ = Q(2,1)*ez + Q(2,2)*eT + Q(2,3)*eR;
+  sigZ = Q(1,1)*ez + Q(1,2)*eT + Q(1,3)*eR;
   tempF = sigZ*r;
   f = int(tempF,r,rim(1),rim(2));
   Ez = solve(f,ez);

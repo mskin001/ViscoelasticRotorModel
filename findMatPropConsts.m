@@ -4,8 +4,6 @@ function [Q, kappa, fi] = findMatPropConsts(b,k)
 % velocity. The material property constants are dependent only on the
 % stiffness of that rim. 
 global mat
-
-[r,c] = size(mat.Q{b,k});
 Q = mat.Q{b,k};
 
 kappa = sqrt(Q(1,1)/Q(3,3));
