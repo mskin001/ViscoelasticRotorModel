@@ -16,7 +16,7 @@ global mat plotWhat
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
   % qdve = quasi-dynamic viscoelasticu
-st = 've';
+st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
@@ -35,7 +35,7 @@ numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 50000;
+rpm = 51000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
