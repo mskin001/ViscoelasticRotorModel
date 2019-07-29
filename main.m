@@ -35,7 +35,7 @@ numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 51000;
+rpm = 50000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
