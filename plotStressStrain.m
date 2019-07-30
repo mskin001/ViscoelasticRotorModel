@@ -344,7 +344,9 @@ if strcmp(plotWhat.axialStr, 'yes')
   axialStr = figure('Visible','on'); %#ok<*NASGU>
 
   hold on
-
+  
+  HaAxial = csvread('Ha2001_axialStress.csv');
+  plot(HaAxial(:,1),HaAxial(:,2),'r-*')
   plot(rArr/min(rArr),sArr(2,:,1)*1e-6,'b-o')
   try
     plot(rArr,sArr(2,:,2),'g-o')

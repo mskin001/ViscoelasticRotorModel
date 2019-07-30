@@ -19,7 +19,7 @@ for b = 1:vari
   u = -mat.rho{1}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*e1*r^2 ...
         + fi(5)*e0;
   eT = u/r;
-  eR = diff(u,r);
+  eR = diff(u,'r');
   eZ = e0 + e1*r;
 
   sigZ = Q(2,1)*eT + Q(2,2)*eZ + Q(2,3)*eR;
