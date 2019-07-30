@@ -47,7 +47,4 @@ for b = 1:vari
 %     + fi(7)*E1*rim(end) + fi(8)*E0 - sigb(2)
 end
   
-
-  %% Check
-  
 end

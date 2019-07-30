@@ -24,8 +24,8 @@ rim = [0.05; 0.1]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-0.77e8, 0];
-mats = {'Glass_Epoxy_Ha1999.mat'};
+sigb = [0, 0];
+mats = {'T300_2500_Ha2001.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
@@ -96,7 +96,7 @@ if strcmp(st,'pe')
   simTime = 1; % steady state = not time changes
   compFunc = 'no'; % Redefineds compFunc to reflect a constant elastic matrix
 
-  if length(rpm) > 1
+  if length(rpm) ~= 1
     error('Rotational velocity not specified. Please specify a single veloctiy\n')
   end
 
@@ -230,7 +230,7 @@ fprintf('Calculate Boundary Conditions: Complete\n')
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
-[~] = discretizeStressStrain(rdiv, delta, E,C,sigb);
+[~] = discretizeStressStrain(rdiv, delta, E,C, sigb);
 
 if vari == -1
   return

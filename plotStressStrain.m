@@ -345,16 +345,16 @@ if strcmp(plotWhat.axialStr, 'yes')
 
   hold on
 
-  plot(rArr,sArr(2,:,1),'b-o')
+  plot(rArr/min(rArr),sArr(2,:,1)*1e-6,'b-o')
   try
     plot(rArr,sArr(2,:,2),'g-o')
     plot(rArr,sArr(2,:,end),'r-*')
   catch
-    return
+    
   end
   xlabel('Radius [mm]')
-  ylabel('Axial Stress [Pa]')
-  legend('Axial Stress')
+  ylabel('Axial Stress [MPa]')
+%   legend('Axial Stress')
 %   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
