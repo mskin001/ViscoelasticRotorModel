@@ -48,13 +48,13 @@ elseif length(w) == 1
       rArr(rvstart:rvend) = rv;
 
       % Calculate discrete displacement vector
-      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(1)*fi(2)*rv.^kappa + C(2)*fi(3)*rv.^-kappa ...
+      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(b,1)*fi(2)*rv.^kappa + C(b,2)*fi(3)*rv.^-kappa ...
             + fi(4)*E(b,2)*rv.^2 + fi(5)*E(b,1)*rv;
       uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
       % Strain
       e1 = dv ./ rv;
-      e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(1)*fi(2)*rv.^(kappa-1) - kappa*C(2)*fi(3)*rv.^(-kappa-1) ...
+      e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(b,1)*fi(2)*rv.^(kappa-1) - kappa*C(b,2)*fi(3)*rv.^(-kappa-1) ...
               + 2*fi(4)*E(b,2)*rv + fi(5)*E(b,1);
       e2 =  E(b,2)*rv + E(b,1); % no strain in the axial or shear directions
       e4 = zeros(size(e1));
