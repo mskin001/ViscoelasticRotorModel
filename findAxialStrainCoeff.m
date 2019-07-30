@@ -17,7 +17,7 @@ for b = 1:vari
 
   % Find axial strain constants
   u = -mat.rho{1}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*e1*r^2 ...
-        + fi(5)*e0;
+        + fi(5)*e0*r;
   eT = u/r;
   eR = diff(u,'r');
   eZ = e0 + e1*r;

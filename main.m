@@ -29,13 +29,13 @@ mats = {'T300_2500_Ha2001.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
-simTime = 10e10;
+simTime = 1;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 59000;
+rpm = 60000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
@@ -210,7 +210,7 @@ delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
 
 %% Find Constants
-[E,C] = findAxialStrainCoeff(sigb);
+[E,~] = findAxialStrainCoeff(sigb);
 
 %% ----------------------------------------------------------------------------
 % Calculate displacement magnitude at the inner and outer surface of each rim
@@ -218,7 +218,7 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-% [~, ~, ~, ~] = boundaryConditions(sigb, delta);
+[~, ~, ~, ~, ~, ~] = boundaryConditions(E,sigb, delta);
 
 if vari == -1
   return
@@ -230,7 +230,7 @@ fprintf('Calculate Boundary Conditions: Complete\n')
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
-[~] = discretizeStressStrain(rdiv, delta, E,C, sigb);
+[~] = discretizeStressStrain(rdiv, delta, E, sigb);
 
 if vari == -1
   return
