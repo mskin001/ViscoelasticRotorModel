@@ -1,4 +1,4 @@
-function [C] = discretizeStressStrain(rdiv, delta, E,C, sigb)
+function [C] = discretizeStressStrain(rdiv, delta, E, sigb)
 % This function calculates a discrete vector of stress and strain in each rim of
 % the rotor. It uses the boundary conditions for each rim caulculated in the
 % function boundaryConditions to find the C constants. These are then used to
@@ -20,7 +20,7 @@ function [C] = discretizeStressStrain(rdiv, delta, E,C, sigb)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global mat rim U w rArr uArr sArr eArr vari
+global mat rim w rArr uArr sArr eArr vari U
 
 %% -----------------------------------------------------------------------------
 % Calculate stress, strain, displacement for each rim
@@ -35,25 +35,35 @@ elseif length(w) == 1
   for b = 1:vari
     for k = 1:length(rim)-1
       [~, kappa, fi] = findMatPropConsts(b,k);
-      
-      InnerStress = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + C(b,1)*rim(1)^(kappa-1) + C(b,2)*rim(1)^(-kappa-1)...
-         + fi(7)*E(b,2)*rim(1) + fi(8)*E(b,1) - sigb(1)
-      OuterStress = -mat.rho{1}*w^2*fi(6)*rim(end)^2 + C(b,1)*rim(end)^(kappa-1) + C(b,2)*rim(end)^(-kappa-1)...
-         + fi(7)*E(b,2)*rim(end) + fi(8)*E(b,1) - sigb(2)
        
       % Discretize radius vector
       rv = linspace(rim(k), rim(k+1), rdiv);
       rvstart = (k-1)*rdiv + 1;
       rvend = k*rdiv;
       rArr(rvstart:rvend) = rv;
-
+      
+      % Calculate integration constants
+      u = [U(b,k); U(b,k+1) - delta(k)];
+      iota = diag([fi(2),fi(3)]);
+      uw = -mat.rho{k}*w^2*fi(1)*[rim(k)^3; rim(k+1)^3];
+      u0 = fi(5)*[rim(k);rim(k+1)];
+      u1 = fi(4)*[rim(k)^2;rim(k+1)^2];
+      G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
+      C = (G*iota)\(u - uw - u0 - u1);
+      
+      % Test boundary conditions
+      InnerStress = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + C(1)*rim(1)^(kappa-1) + C(2)*rim(1)^(-kappa-1)...
+         + fi(7)*E(b,2)*rim(1) + fi(8)*E(b,1) - sigb(1)
+      OuterStress = -mat.rho{1}*w^2*fi(6)*rim(end)^2 + C(1)*rim(end)^(kappa-1) + C(2)*rim(end)^(-kappa-1)...
+         + fi(7)*E(b,2)*rim(end) + fi(8)*E(b,1) - sigb(2)
+       
       % Calculate discrete displacement vector
-      dv = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(1)*fi(2)*rv.^kappa + C(2)*fi(3)*rv.^-kappa ...
+      ur = -mat.rho{k}*w^2*fi(1)*rv.^3 + C(1)*fi(2)*rv.^kappa + C(2)*fi(3)*rv.^-kappa ...
             + fi(4)*E(b,2)*rv.^2 + fi(5)*E(b,1)*rv;
-      uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
+      uArr(b,rvstart:rvend) = ur; % Discrete displacement throughout the rim
 
       % Strain
-      e1 = dv ./ rv;
+      e1 = ur ./ rv;
       e3 = -3*mat.rho{k}*w^2*fi(1)*rv.^2 + kappa*C(1)*fi(2)*rv.^(kappa-1) - kappa*C(2)*fi(3)*rv.^(-kappa-1) ...
               + 2*fi(4)*E(b,2)*rv + fi(5)*E(b,1);
       e2 = E(b,2)*rv + E(b,1) % no strain in the axial or shear directions

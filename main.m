@@ -1,4 +1,4 @@
-clc
+% clc
 clear
 close('all','force')
 %% -----------------------------------------------------------------------------
@@ -19,23 +19,25 @@ global mat plotWhat
 st = 'pe';
 
 % Rotor
-% rim = [0.03789; 0.07901]; % single rim Ha 1999
+% rim = [0.05; 0.1]; % single rim Ha 1999
+rim = [0.03789, 0.079];
 % rim = [0.03786, 0.08393, 0.14707];
-rim = [0.0762, .1524]; % Tzeng2001
+% rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [0, 0];
-mats = {'IM7_8552_Tzeng2001.mat'};
+sigb = [-.778e8, 0];
+mats = {'Glass_Epoxy_Ha1999.mat'};
+% mats = {'T300_2500_Ha2001.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
-simTime = 10e10;
+simTime = 10;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 51000;
+rpm = 60000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
@@ -44,7 +46,7 @@ plotWhat.custom1 = 'yes';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'yes';
+plotWhat.radDis = 'no';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
@@ -53,6 +55,8 @@ plotWhat.radStr = 'yes';         % Radial stress v. radius plot
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
 plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
+
+plotWhat.axialStr = 'no';
 
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
@@ -94,7 +98,7 @@ if strcmp(st,'pe')
   simTime = 1; % steady state = not time changes
   compFunc = 'no'; % Redefineds compFunc to reflect a constant elastic matrix
 
-  if length(rpm) > 1
+  if length(rpm) ~= 1
     error('Rotational velocity not specified. Please specify a single veloctiy\n')
   end
 
@@ -148,7 +152,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [3600, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
+  tArr = [1, 1*10e5, 1*10e10]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')
@@ -208,7 +212,7 @@ delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
 
 %% Find Constants
-[E,C] = findAxialStrainCoeff(sigb);
+[E,~] = findAxialStrainCoeff(sigb);
 
 %% ----------------------------------------------------------------------------
 % Calculate displacement magnitude at the inner and outer surface of each rim
@@ -216,7 +220,7 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-% [~, ~, ~, ~] = boundaryConditions(sigb, delta);
+[~, ~, ~, ~, ~, ~] = boundaryConditions(E,sigb, delta);
 
 if vari == -1
   return
@@ -228,7 +232,7 @@ fprintf('Calculate Boundary Conditions: Complete\n')
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
-[~] = discretizeStressStrain(rdiv, delta, E,C,sigb);
+[~] = discretizeStressStrain(rdiv, delta, E, sigb);
 
 if vari == -1
   return

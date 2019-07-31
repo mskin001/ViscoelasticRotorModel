@@ -1,4 +1,4 @@
-function [Fw, Fd, Fb, K] = boundaryConditions(sigb, delta)
+function [Fw, Fe0, Fe1, Fd, Fb, K] = boundaryConditions(E, sigb, delta)
 % This funciton calculates the displacement at the inner and outer surface of
 % each rim. These will be used as boundary conditions to calculate the stress
 % displacement throughout the entire rotor. The function is separated into
@@ -24,6 +24,8 @@ global U rim w mat arraySize vari
 
 K = zeros(arraySize,arraySize);    % global stiffness matrix
 Fw = zeros(arraySize,1);           % vector of centrifugal forces
+Fe0 = zeros(arraySize,1);          % vector of axial strain forces
+Fe1 = zeros(arraySize,1);          % vector of axial strain forces
 Fd = zeros(arraySize,1);           % vector of presress forces
 Fb = zeros(arraySize,1);           % vector of boundary condition forces
 %% -----------------------------------------------------------------------------
@@ -38,32 +40,35 @@ if length(w) > 1 % First part is for qdve simulation
 elseif length(w) == 1 % Second part for pe and ve simulations
   for b = 1:vari
     for k = 1:length(rim)-1
-      Q11 = mat.Q{b,k}(1,1);
-      Q13 = mat.Q{b,k}(1,3);
-      Q33 = mat.Q{b,k}(3,3);
-      kappa = sqrt(Q11/Q33);
-
-      % intermediate variables for calculating the stiffness matrix
-      fi0 = 1/(Q33 * (9 - kappa^2));
-      fi3 = (3 * Q33 + Q13) / (Q33 * (9 - kappa^2));
+      [Q, kappa, fi] = findMatPropConsts(b,k);
 
       z = rim(k)/rim(k+1);
       z1 = z^-kappa + z^kappa;
       z2 = z^-kappa - z^kappa;
-
+      
       % Local stiffness matrix
-      kMat = (1/z2) * [kappa*z1*Q33-z2*Q13, -2*kappa*Q33;
-                      -2*kappa*Q33, kappa*z1*Q33+z2*Q13];
+      kMat = (1/z2) * [kappa*z1*Q(3,3)-z2*Q(1,3), -2*kappa*Q(3,3);
+                      -2*kappa*Q(3,3), kappa*z1*Q(3,3)+z2*Q(1,3)];
 
       % Global stiffness matrix for the entire
       K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
-
-      fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
-      uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
       
+      % Calculate force terms
+      uw = -(mat.rho{k})*w^2*fi(1)*[rim(k)^3; rim(k+1)^3];
+      u0 = fi(5)*[rim(k); rim(k+1)];
+      u1 = fi(4)*[rim(k)^2; rim(k+1)^2];
+      
+      fsig = -(mat.rho{k})*w^2*fi(6)*[-rim(k)^3; rim(k+1)^3];
+      f0 = fi(8)*E(b,1)*[-rim(k); rim(k+1)];
+      f1 = fi(7)*E(b,2)*[-rim(k)^2; rim(k+1)^2];
+            
       fw = -fsig + kMat*uw;
-      Fw(k:k+1) = Fw(k:k+1) + fw;
+      fe0 = -f0 + kMat*u0;
+      fe1 = -f1 + kMat*u1;
       
+      Fw(k:k+1) = Fw(k:k+1) + fw;
+      Fe0(k:k+1) = Fe0(k:k+1) + fe0;
+      Fe1(k:k+1) = Fe1(k:k+1) + fe1;
       Fd(k:k+1) = Fd(k:k+1) + kMat*[0;delta(k)];
     end
 
@@ -71,7 +76,7 @@ elseif length(w) == 1 % Second part for pe and ve simulations
     Fb(1) = -rim(1)*sigb(1);
     Fb(end) = rim(end)*sigb(end);
     % Displacement at the inner and outer radius of each rim
-    U(b,:) = K \ (Fb + Fw + Fd);
+    U(b,:) = K \ (Fb + Fw + Fe0 + Fe1 + Fd);
 
     % Reset matrix values
     K = K .* 0;
