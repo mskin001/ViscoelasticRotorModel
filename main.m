@@ -27,7 +27,7 @@ rdiv = 30; % number of points per rim to analyze
 delta = [0,0,0]/1000; % [mm]
 sigb = [0, 0];
 mats = {'Glass_Epoxy_Ha1999.mat','T300_2500_Ha2001.mat','T800H_2500_Ha2001.mat'};
-% mats = {'T300_2500_Ha2001.mat'};
+% mats = {'IM7_8552_Tzeng2001.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
@@ -37,7 +37,7 @@ numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 60000;
+rpm = 50000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
@@ -152,7 +152,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [1, 1*10e5, 1*10e10]; % Assumes 1 sec time intervals
+  tArr = [1, 10^5, 10^10]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')
@@ -220,7 +220,7 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-[~, ~, ~, ~, ~, ~] = boundaryConditions(E,sigb, delta);
+% [~, ~, ~, ~, ~, ~] = boundaryConditions(E, sigb, delta);
 
 if vari == -1
   return

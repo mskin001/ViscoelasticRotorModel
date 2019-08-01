@@ -19,7 +19,7 @@ for b = 1:vari
 
   for k = 1:length(rim)-1
     [Q, kappa, fi] = findMatPropConsts(b,k);
-  % Find axial strain constants    
+    % Find axial strain constants    
     u = -mat.rho{k}*w^2*fi(1)*r^3 + C1*fi(2)*r^kappa + C2*fi(3)*r^-kappa + fi(4)*e1*r^2 ...
           + fi(5)*e0*r;
     eT = u/r;
@@ -42,20 +42,20 @@ for b = 1:vari
   E1 = subs(E1,e0,E0);
   E0 = double(E0);
   E1 = double(E1);
-  E(b,:) = [E0,E1];
+  E(b,:) = [E0;E1];
   C1 = subs(C1,{e0,e1},[E0,E1]);
   C1 = double(C1);
   C2 = subs(C2,{e0,e1},[E0,E1]);
   C2 = double(C2);
-  C(b,:) = [C1,C2];
+  C(b,:) = [C1;C2];
   
   [Q, kappa, fi] = findMatPropConsts(b,1);
-  InnerStress = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + C(1)*rim(1)^(kappa-1) + C(2)*rim(1)^(-kappa-1)...
-    + fi(7)*E(2)*rim(1) + fi(8)*E(1) - sigb(1)
+  InnerStress = -mat.rho{1}*w^2*fi(6)*rim(1)^2 + C(b,1)*rim(1)^(kappa-1) + C(b,2)*rim(1)^(-kappa-1)...
+    + fi(7)*E(b,2)*rim(1) + fi(8)*E(b,1) - sigb(1)
   
   [Q, kappa, fi] = findMatPropConsts(b,length(rim)-1);
-  OuterStress = -mat.rho{end}*w^2*fi(6)*rim(end)^2 + C(1)*rim(end)^(kappa-1) + C(2)*rim(end)^(-kappa-1)...
-    + fi(7)*E(2)*rim(end) + fi(8)*E(1) - sigb(2)
+  OuterStress = -mat.rho{end}*w^2*fi(6)*rim(end)^2 + C(b,1)*rim(end)^(kappa-1) + C(b,2)*rim(end)^(-kappa-1)...
+    + fi(7)*E(b,2)*rim(end) + fi(8)*E(b,1) - sigb(2)
 end
   
 end
