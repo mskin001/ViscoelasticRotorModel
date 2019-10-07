@@ -141,9 +141,9 @@ if strcmp(plotWhat.radDis, 'yes')
 %   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
 %   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
 %   
-  plot(rArr*39.3701,uArr(1,:)*39.3701,'b-o')
-%   plot(rArr*39.3701,uArr(2,:)*39.3701,'g-o')
-%   plot(rArr*39.3701,uArr(end,:)*39.3701,'r-o')  
+  plot(rArr,uArr(1,:),'b-o')
+  plot(rArr,uArr(2,:),'g-o')
+  plot(rArr,uArr(end,:),'r-o')  
   
   xlabel('Radius [in]')
   ylabel('Radial Displacement [in]')
