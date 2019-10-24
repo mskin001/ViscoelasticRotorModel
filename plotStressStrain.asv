@@ -139,13 +139,13 @@ if strcmp(plotWhat.radDis, 'yes')
 %   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
 %   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
   
-  plot(rArr*1000,uArr(1,:)*1000,'b-o')
+  plot(rArr*39.3701,uArr(1,:)*39.3701,'b-o')
 %   plot(rArr*39.3701,uArr(2,:)*39.3701,'g-o')
 %   plot(rArr*39.3701,uArr(end,:)*39.3701,'r-o')  
   
-  xlabel('Radius [mm]')
-  ylabel('Radial Displacement [mm]')
-%   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
+  xlabel('Radius [in]')
+  ylabel('Radial Displacement [in]')
+  legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
   fprintf('Radial Displacement Plot: Complete\n')
@@ -224,21 +224,21 @@ end
 if strcmp(plotWhat.radStr, 'yes')
   radStr = figure('Visible','on');
   
-%   TzengInitial = csvread('Tzeng2001RadialStrInitial.csv');
-%   TzengMid = csvread('Tzeng2001RadialStrMid.csv');
-%   TzengInf = csvread('Tzeng2001RadialStrInf.csv');
+  TzengInitial = csvread('Tzeng2001RadialStrInitial.csv');
+  TzengMid = csvread('Tzeng2001RadialStrMid.csv');
+  TzengInf = csvread('Tzeng2001RadialStrInf.csv');
   
   hold on
-%   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
-%   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
-%   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-  plot(rArr*1000,sArr(3,:,1)*10^-6,'b-o')
-%   plot(rArr*39.3701,sArr(3,:,2)*0.000145038,'g-o')
-%   plot(rArr*39.3701,sArr(3,:,end)*0.000145038,'r-o')
+  plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
+  plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
+  plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
+  plot(rArr*39.3701,sArr(3,:,1)*0.000145038,'b-o')
+  plot(rArr*39.3701,sArr(3,:,2)*0.000145038,'g-o')
+  plot(rArr*39.3701,sArr(3,:,end)*0.000145038,'r-o')
   
-  xlabel('Radius [mm]')
-  ylabel('Radial Stress [MPa]')
-%   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
+  xlabel('Radius [in]')
+  ylabel('Radial Stress [psi]')
+  legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
   fprintf('Radial Sress Plot: Complete\n')
@@ -315,19 +315,19 @@ end
 
 if strcmp(plotWhat.hoopStr, 'yes')
   hoopStr = figure('Visible','on'); %#ok<*NASGU>
-%   TzengInitial = csvread('Tzeng2001HoopInitial.csv');
-%   TzengMid = csvread('Tzeng2001HoopMid.csv');
-%   TzengInf = csvread('Tzeng2001HoopInf.csv');
+  TzengInitial = csvread('Tzeng2001HoopInitial.csv');
+  TzengMid = csvread('Tzeng2001HoopMid.csv');
+  TzengInf = csvread('Tzeng2001HoopInf.csv');
   hold on
-%   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
-%   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
-%   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-  plot(rArr*1000,sArr(1,:,1)*10^-6,'b-o')
-%   plot(rArr*39.3701,sArr(1,:,2)*0.000145038,'g-o')
-%   plot(rArr*39.3701,sArr(1,:,end)*0.000145038,'r-*')
-  xlabel('Radius [mm]')
-  ylabel('Hoop Stress [MPa]')
-%   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
+  plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
+  plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
+  plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
+  plot(rArr*39.3701,sArr(1,:,1)*0.000145038,'b-o')
+  plot(rArr*39.3701,sArr(1,:,2)*0.000145038,'g-o')
+  plot(rArr*39.3701,sArr(1,:,end)*0.000145038,'r-*')
+  xlabel('Radius [in]')
+  ylabel('Hoop Stress [psi]')
+  legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
   fprintf('Hoop Stress Plot: Complete\n')
