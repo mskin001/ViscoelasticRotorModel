@@ -21,12 +21,12 @@ st = 'pe';
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [.10, .110, 0.17, .2];
+rim = [.10, .110, 0.17];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = [0.399, 0.413, 0]/1000; % [mm]
+delta = [0.4, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999.mat', 'AS4_HexTow.mat'};
+mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
