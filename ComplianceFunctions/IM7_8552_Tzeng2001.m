@@ -12,5 +12,5 @@ global t
 tr = mstiff(2);
 s = mstiff(3);
 
-out(1) = 1/tr * (t/3600)^0.03;
-out(2) = 1/s * (t/3600)^0.03;
+out(1) = 1/tr * (t)^0.03;
+out(2) = 1/s * (t)^0.03;
