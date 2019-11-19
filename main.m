@@ -130,35 +130,40 @@ else
 end
 
 fprintf('Check Input Variables: Complete\n')
-%% -----------------------------------------------------------------------------
+%%
+% This section has been commented out for integration of VE and progressive
+% damage models. 
+% 
+% Remove when completed
+% -----------------------------------------------------------------------------
 % Create speed/time arrays depending on simulation global
 % ------------------------------------------------------------------------------
-if length(rpm) > 1
-  wComp = zeros(vdiv, 1);
-  for k = 1:length(rpm)-1
-    w1 = (pi/30) * rpm(k);
-    w2 = (pi/30) * rpm(k+1);
-    wStart = (k-1)*vdiv + 1;
-    wEnd = k*vdiv;
-    wComp(wStart:wEnd) = linspace(w1, w2, vdiv);
-  end
-  w = wComp;
-  vari = length(wComp);
-elseif simTime > 1
-  if strcmp(timeUnit, 'h')
-    simTime = simTime * 3600; % convert hours to seconds
-  elseif strcmp(timeUnit, 'd')
-    simTime = simTime * 24 * 3600; % Convert days to seconds
-  end
-  tArr = [3600, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
-  w = (pi/30) * rpm;
-  vari = length(tArr);
-  addpath('ComplianceFunctions')
-else
-  w = (pi/30) * rpm;
-  vari = 1;
-  tArr = 1;
-end
+% if length(rpm) > 1
+%   wComp = zeros(vdiv, 1);
+%   for k = 1:length(rpm)-1
+%     w1 = (pi/30) * rpm(k);
+%     w2 = (pi/30) * rpm(k+1);
+%     wStart = (k-1)*vdiv + 1;
+%     wEnd = k*vdiv;
+%     wComp(wStart:wEnd) = linspace(w1, w2, vdiv);
+%   end
+%   w = wComp;
+%   vari = length(wComp);
+% elseif simTime > 1
+%   if strcmp(timeUnit, 'h')
+%     simTime = simTime * 3600; % convert hours to seconds
+%   elseif strcmp(timeUnit, 'd')
+%     simTime = simTime * 24 * 3600; % Convert days to seconds
+%   end
+%   tArr = [3600, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
+%   w = (pi/30) * rpm;
+%   vari = length(tArr);
+%   addpath('ComplianceFunctions')
+% else
+%   w = (pi/30) * rpm;
+%   vari = 1;
+%   tArr = 1;
+% end
 
 fprintf('Create Variable Arrays: Complete\n')
 %% -----------------------------------------------------------------------------
@@ -182,29 +187,29 @@ prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
   'setappdata(gcbf,''Canceling'',1)');
 setappdata(prog,'Canceling',0);
 
-for b = 1:vari
-  t = tArr(b);  
-  if getappdata(prog,'Canceling')
-    delete(prog)
-    return
-  end
-  
-  for k = 1:length(mats)
-      mat.file{k} = ['MaterialProperties\', mats{k}];
-      matProp = load(mat.file{k});
-      mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
-      mat.rho{k} = matProp.rho;
-      
-      try
-        mat.stren{k} = matProp.stren;
-      catch
-        break
-      end
-  end
-  
-  perc = (b / vari);
-  waitbar(perc,prog)  
+
+t = tArr(b);  
+if getappdata(prog,'Canceling')
+  delete(prog)
+  return
 end
+
+for k = 1:length(mats)
+    mat.file{k} = ['MaterialProperties\', mats{k}];
+    matProp = load(mat.file{k});
+    mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
+    mat.rho{k} = matProp.rho;
+
+    try
+      mat.stren{k} = matProp.stren;
+    catch
+      break
+    end
+end
+
+perc = (b / vari);
+waitbar(perc,prog)  
+
 
 delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
