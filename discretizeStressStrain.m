@@ -25,9 +25,6 @@ global mat rim U w rArr uArr sArr eArr vari
 %% -----------------------------------------------------------------------------
 % Calculate stress, strain, displacement for each rim
 % ------------------------------------------------------------------------------
-prog = waitbar(0,'Descretize Stress/Strain', 'CreateCancelBtn',...
-  'setappdata(gcbf,''Canceling'',1)');
-setappdata(prog,'Canceling',0);
 
 for k = 1:length(rim)-1
   Q11 = mat.Q{b,k}(1,1);
@@ -71,14 +68,4 @@ for k = 1:length(rim)-1
   sArr(:,rvstart:rvend,b) = stress;
 end
 
-if getappdata(prog,'Canceling')
-  delete(prog)
-  vari = -1;
-  return
-end
-perc = (b / vari);
-waitbar(perc,prog)
-
-
-delete(prog)
 end

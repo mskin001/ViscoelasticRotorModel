@@ -71,13 +71,4 @@ Fw = Fw .* 0;
 Fb = Fb .* 0;
 Fd = Fd .* 0;
 
-if getappdata(prog,'Canceling')
-  delete(prog)
-  vari = -1;
-  return
-end
-perc = (b / vari);
-waitbar(perc,prog)
-
-delete(prog)
 end

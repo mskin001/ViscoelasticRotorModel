@@ -1,22 +1,24 @@
 clc
 clear
 close('all','force')
+
 %% -----------------------------------------------------------------------------
-% Define global variables
-% ------------------------------------------------------------------------------
+%  Define global variables
+%  -----------------------------------------------------------------------------
 % Global variables and arrays
 global U w rim arraySize rArr uArr sArr eArr t vari
 % Global structures
 global mat plotWhat
 
 %% -----------------------------------------------------------------------------
-% Define initial conditions and rotor size
-% ------------------------------------------------------------------------------
+%  Define initial conditions and rotor size
+%  -----------------------------------------------------------------------------
 % simulation type:
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
-  % qdve = quasi-dynamic viscoelasticu
+
 st = 'pe';
+Ftype = 'TsaiWu'
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
@@ -60,9 +62,10 @@ plotWhat.delay = 0;              % Time delay in seconds between frames in the g
                                  %   0 is fastest
 
 %% -----------------------------------------------------------------------------
-% Start Program
-% ------------------------------------------------------------------------------
-fprintf('Simulation type: %s\n',st)
+%  Start Program
+%  -----------------------------------------------------------------------------
+fprintf('Material Behavior: %s\n',st)
+fprintf('Failure Model: %s\n', Ftype)
 fprintf('Simulation time: %1.0f %s\n',simTime,timeUnit)
 fprintf('Number of rims: %1.0f\n',length(rim)-1)
 fprintf('Material Selections: %s\n', mats{1:end})
@@ -71,8 +74,8 @@ fprintf('Rotational velocity: %1.0f rpm\n\n', rpm)
 fprintf('Program Start: \n')
 
 %% -----------------------------------------------------------------------------
-% Check input variables
-% ------------------------------------------------------------------------------
+%  Check input variables
+%  -----------------------------------------------------------------------------
 % General
 if length(rim)-1 ~= length(mats) || length(rim)-1 ~= length(delta)
   error('Error in rim, mat, and delta. There must be an equal number of rims, materials, and interferance values.\n')
@@ -130,45 +133,10 @@ else
 end
 
 fprintf('Check Input Variables: Complete\n')
-%%
-% This section has been commented out for integration of VE and progressive
-% damage models. 
-% 
-% Remove when completed
-% -----------------------------------------------------------------------------
-% Create speed/time arrays depending on simulation global
-% ------------------------------------------------------------------------------
-% if length(rpm) > 1
-%   wComp = zeros(vdiv, 1);
-%   for k = 1:length(rpm)-1
-%     w1 = (pi/30) * rpm(k);
-%     w2 = (pi/30) * rpm(k+1);
-%     wStart = (k-1)*vdiv + 1;
-%     wEnd = k*vdiv;
-%     wComp(wStart:wEnd) = linspace(w1, w2, vdiv);
-%   end
-%   w = wComp;
-%   vari = length(wComp);
-% elseif simTime > 1
-%   if strcmp(timeUnit, 'h')
-%     simTime = simTime * 3600; % convert hours to seconds
-%   elseif strcmp(timeUnit, 'd')
-%     simTime = simTime * 24 * 3600; % Convert days to seconds
-%   end
-%   tArr = [3600, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
-%   w = (pi/30) * rpm;
-%   vari = length(tArr);
-%   addpath('ComplianceFunctions')
-% else
-%   w = (pi/30) * rpm;
-%   vari = 1;
-%   tArr = 1;
-% end
-
 fprintf('Create Variable Arrays: Complete\n')
 %% -----------------------------------------------------------------------------
-% Preallocate variables
-% ------------------------------------------------------------------------------
+%  Preallocate variables
+%  -----------------------------------------------------------------------------
 arraySize = length(rim);
 U = zeros(vari,arraySize);
 rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
@@ -181,39 +149,28 @@ mat.Q = cell(vari,length(mats));
 
 fprintf('Preallocate Memory: Complete\n')
 %% -----------------------------------------------------------------------------
-% Create Q matrices for all materials
-% ------------------------------------------------------------------------------
-prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
-  'setappdata(gcbf,''Canceling'',1)');
-setappdata(prog,'Canceling',0);
-
-
-t = tArr(b);  
-if getappdata(prog,'Canceling')
-  delete(prog)
-  return
-end
-
+%  Create Q matrices for all materials
+%  -----------------------------------------------------------------------------
 for k = 1:length(mats)
-    mat.file{k} = ['MaterialProperties\', mats{k}];
-    matProp = load(mat.file{k});
-    mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
-    mat.rho{k} = matProp.rho;
+  mat.file{k} = ['MaterialProperties\', mats{k}];
+  matProp = load(mat.file{k});
+  mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
+  mat.rho{k} = matProp.rho;
 
-    try
-      mat.stren{k} = matProp.stren;
-    catch
-      break
+  try
+    mat.stren{k} = matProp.stren;
+  catch
+    if ~strcmp(Ftype, 'none')
+      error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
     end
+    break
+  end
 end
 
-perc = (b / vari);
-waitbar(perc,prog)  
-
-
-delete(prog)
 fprintf('Create Material Property Matrices: Complete\n')
-%% ----------------------------------------------------------------------------
+%% -----------------------------------------------------------------------------
+%  Displacement of rim surfaces
+%  -----------------------------------------------------------------------------
 % Calculate displacement magnitude at the inner and outer surface of each rim
 % these are used as boundary conditions to find C. ~ is used to disregard
 % output of force vector results. These can be important for debugging and
@@ -221,23 +178,32 @@ fprintf('Create Material Property Matrices: Complete\n')
 % discription for mor info
 [~, ~, ~, ~] = boundaryConditions(sigb, delta);
 
-if vari == -1
-  return
-end
 fprintf('Calculate Boundary Conditions: Complete\n')
 %% -----------------------------------------------------------------------------
+%  Rotor stress strain calculations
+%  -----------------------------------------------------------------------------
 % Calculate discrete displacement, stain, and stress for each rim ~ here is
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
 [~] = discretizeStressStrain(rdiv, delta);
 
-if vari == -1
-  return
-end
 fprintf('Descretize Stress/Strain: Complete\n')
 %% -----------------------------------------------------------------------------
-% Make Plots
+%  Failure behavior and locations
+%  -----------------------------------------------------------------------------
+% Failure index and type calculations. Calcuates the failure index using the
+% selected faliure modes, determines the type of failure (cracking or burst),
+% and identifies the failure location. Outputs determine if the simulation
+% should continue or end.
+
+if ~strcmp(Ftype, 'none')
+    [Fmode, failureIndex, Floc] = failureIndex(Ftype);
+end
+
+%% -----------------------------------------------------------------------------
+%  Make Plots
+%  -----------------------------------------------------------------------------
 plotStressStrain()
 
 fprintf('Create Output Plots: Complete\n\n')
