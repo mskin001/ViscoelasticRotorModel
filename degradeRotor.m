@@ -16,6 +16,4 @@ degOuter = Floc + dThicc/2; % Outer radius of degraded ring
 degRing = [degInner, degOuter]; % Degrated ring radii. This vector will always be size [1,2]
 
 newRotor = zeros(1,(length(rim) + length(degRing)));
-newRotor(1:rimInd) = rim(1:rimInd); % All the rim dimentions less than the failure location
-newRotor(rimInd+1:rimInd+2) = degRing; % Add in an additional rim representing the radial failure
-newRotor(rimInd+3:end) = rim(rimInd+1:end); % All rim radii greater than the failure location
+newRotor = [rim(1:rimInd), degRing, rim(rimInd+1:end)]; % All the rim dimentions less than the failure location
