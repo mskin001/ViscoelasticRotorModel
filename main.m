@@ -6,9 +6,9 @@ close('all','force')
 %  Define global variables
 %  -----------------------------------------------------------------------------
 % Global variables and arrays
-global U w rim arraySize rArr uArr sArr eArr rdiv vari
+global U w numRims arraySize rArr uArr sArr eArr rdiv
 % Global structures
-global mat plotWhat
+global plotWhat rotor
 
 %% -----------------------------------------------------------------------------
 %  Define initial conditions and rotor size
@@ -21,11 +21,11 @@ st = 'pe';
 Ftype = 'MaxR'; % Options: TsaiWu, MaxR
 
 % Rotor
-rim = [.10, .110, 0.17]; % rim radii in [m]
+rim = [.10, .110, 0.19, 0.2]; % rim radii in [m]
 rdiv = 30; % number of points per rim to analyze
-delta = [0.4, 0]/1000; % [mm]
+delta = [0.4, 0.4, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999.mat'};
+mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999', 'IM7_8552_Tzeng2001.mat'};
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Time
@@ -35,7 +35,7 @@ numberOfSteps = 3;
 startime = 1;
 
 % Velocity
-iRPM = 38000; % Initial rpm
+iRPM = 34000; % Initial rpm
 dThicc = 0.0015; % Damaged ring thickness [m]
 degStiffPerc = 0.01; % Degraded stiffness percent
 vdiv = 1; % number of points to analyze between each fixed velocity
@@ -132,52 +132,62 @@ else
 end
 
 fprintf('Check Input Variables: Complete\n')
-fprintf('Create Variable Arrays: Complete\n')
+
 %% -----------------------------------------------------------------------------
 %  Preallocate variables
 %  -----------------------------------------------------------------------------
-arraySize = length(rim);
-U = zeros(vari,arraySize);
+numRims = length(rim)-1;
+arraySize = length(rim); % Intermediate variable
+
+U = zeros(1,arraySize);
 rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
-uArr = zeros(vari,(arraySize-1)*rdiv);    % displacement vector for discretization
-sArr = zeros(4,(arraySize-1)*rdiv,vari);    % stress vector
+uArr = zeros(1,(arraySize-1)*rdiv);    % displacement vector for discretization
+sArr = zeros(4,(arraySize-1)*rdiv);    % stress vector
 eArr = zeros(4, rdiv);    % strain vector in each direction
-mat = struct();
-mat.file = cell(length(mats),1);
-mat.Q = cell(vari,length(mats));
+
+rotor = struct();
+rotor.pos = zeros(1, numRims);
+rotor.radii = cell(1, numRims);
+rotor.Q = cell(1, numRims);
+rotor.rho = zeros(1,numRims);
+rotor.stren = cell(1,numRims);
+rotor.rimIntact = ones(1,numRims); % '1' indicates the rim is intact. All rims initially intact.
 
 fprintf('Preallocate Memory: Complete\n')
 
 %% -----------------------------------------------------------------------------
-%  Create Q matrices for all materials
+%  Create Q matrices and proprogate rotor structures
 %  -----------------------------------------------------------------------------
-b = 1;
 
-for k = 1:length(mats)
+rotor.pos = linspace(1,numRims,numRims);
+for k = 1:numRims
+  rotor.radii{k} = [rim(k),rim(k+1)];
+
   mat.file{k} = ['MaterialProperties\', mats{k}];
   matProp = load(mat.file{k});
-  mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
-  mat.rho{k} = matProp.rho;
+  rotor.Q{k} = stiffMat(matProp.mstiff, compFunc);
+  rotor.rho(k) = matProp.rho;
 
   try
-    mat.stren{k} = matProp.stren;
+    rotor.stren{k} = matProp.stren;
   catch
     if ~strcmp(Ftype, 'none')
       error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
+    else
+    warning('Yield strength not specified for this material')
+    fprintf('%s\n', mats{k});
     end
-    break
   end
 end
 
 fprintf('Create Material Property Matrices: Complete\n')
 
 iter = 0; % 0 corresponds to the initial starting time and velocity. This might change to vari when incorporating VE behavior
-
 while ~failure
-%% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 %  Current time and velocity
 %  -----------------------------------------------------------------------------
-  cRPM = iRPM + 10*iter;
+  cRPM = iRPM + 1*iter;
   w = (pi/30) * cRPM;
 
   fprintf('Faiure = %f\n', failure);
@@ -221,26 +231,28 @@ while ~failure
   if ~strcmp(Ftype, 'none')
     [failure, ~, Fmode, Floc] = failureIndex(Ftype);
     fprintf('Failure Analysis: Complete\n');
-    [newRotor, rimInd] = degradeRotor(Floc, dThicc);
-
-    mat.file = ['MaterialProperties\', mats{rimInd}];
-    ringProps = load(mat.file);
-    ringProps.mstiff(2) = degStiffPerc * matProp.mstiff(2);
-    ringStiff = stiffMat(ringProps.mstiff, compFunc);
-    ringRho = ringProps.rho;
-    ringStren = rinProps.stren;
-
-    tempQ = cell(1,length(newRotor));
-    tempQ{1:rimInd+2} = {mat.Q{1:rimInd}, ringStiff, mat.Q{rimInd}};
-
-    if
-    tempQ{rimInd+2} = {mat.Q{rimInd}};
+    
+%
+%     mat.file = ['MaterialProperties\', mats{rimInd}];
+%     ringProps = load(mat.file);
+%     ringProps.mstiff(2) = degStiffPerc * matProp.mstiff(2);
+%     ringStiff = stiffMat(ringProps.mstiff, compFunc);
+%     ringRho = ringProps.rho;
+%     ringStren = rinProps.stren;
+%
+%     tempQ = cell(1,length(newRotor));
+%     tempQ{1:rimInd+2} = {mat.Q{1:rimInd}, ringStiff, mat.Q{rimInd}};
+%     tempQ{rimInd+2} = {mat.Q{rimInd}};
 
     %Integrate ring stiffness, density, and strength into the larger mat structure.
+  else
+      failure = 1; % When not evaluating failure, set to 1 to iterate exactly once.
   end
 
   iter = iter + 1;
 end
+
+[newRotor, rimInd] = degradeRotor(rim, Floc, dThicc);
 %% -----------------------------------------------------------------------------
 %  Make Plots
 %  -----------------------------------------------------------------------------

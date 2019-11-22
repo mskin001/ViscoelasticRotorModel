@@ -20,19 +20,16 @@ function [C] = discretizeStressStrain(delta)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global mat rim U w rArr uArr sArr eArr rdiv
+global rotor numRims U w rArr uArr sArr eArr rdiv
 
 %% -----------------------------------------------------------------------------
 % Calculate stress, strain, displacement for each rim
 % ------------------------------------------------------------------------------
-b = 1;
-
-for k = 1:length(rim)-1
-  Q11 = mat.Q{b,k}(1,1);
-  Q12 = mat.Q{b,k}(1,2);
-  Q13 = mat.Q{b,k}(1,3);
-  Q23 = mat.Q{b,k}(2,3);
-  Q33 = mat.Q{b,k}(3,3);
+for k = 1:numRims
+  rim = rotor.radii{k};
+  Q11 = rotor.Q{k}(1,1);
+  Q13 = rotor.Q{k}(1,3);
+  Q33 = rotor.Q{k}(3,3);
   kappa = sqrt(Q11/Q33); % intermediate variable of stiffness ratio
 
   % intermediate variables for calculating the stiffness matrix
@@ -41,32 +38,32 @@ for k = 1:length(rim)-1
   fi2 = 1/(Q13 - (kappa * Q33));
 
   % Calculate absolute displacement at the inner and outer surface of each rim
-  u = [U(b,k); U(b,k+1) - delta(k)];
+  u = [U(1,k); U(1,k+1) - delta(k)];
   iota = diag([fi1,fi2]);
-  uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
-  G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
+  uw = -rotor.rho(k)*w^2*fi0*[rim(1)^3; rim(2)^3];
+  G = [rim(1)^kappa rim(1)^-kappa; rim(2)^kappa rim(2)^-kappa];
   C = (G*iota)\(u - uw);
 
   % Discretize radius vector
-  rv = linspace(rim(k), rim(k+1), rdiv);
+  rv = linspace(rim(1), rim(2), rdiv);
   rvstart = (k-1)*rdiv + 1;
   rvend = k*rdiv;
   rArr(rvstart:rvend) = rv;
 
   % Calculate discrete displacement vector
-  dv = -mat.rho{k}*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
-  uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
+  dv = -rotor.rho(k)*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
+  uArr(rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
   % Strain
   e1 = dv ./ rv;
-  e3 = -3*mat.rho{k}*w^2*fi0*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
+  e3 = -3*rotor.rho(k)*w^2*fi0*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
   e2 = zeros(size(e1)); % no strain in the axial or shear directions
   e4 = zeros(size(e1));
   eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]
 
   % Stress
-  stress = mat.Q{b,k} * eArr;
-  sArr(:,rvstart:rvend,b) = stress;
+  stress = rotor.Q{k} * eArr;
+  sArr(:,rvstart:rvend) = stress;
 end
 
 end

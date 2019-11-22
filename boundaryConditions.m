@@ -20,28 +20,28 @@ function [Fw, Fd, Fb, K] = boundaryConditions(sigb, delta)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global U rim w mat arraySize
+global rotor numRims U w arraySize
 
 K = zeros(arraySize,arraySize);    % global stiffness matrix
 Fw = zeros(arraySize,1);           % vector of centrifugal forces
 Fd = zeros(arraySize,1);           % vector of presress forces
 Fb = zeros(arraySize,1);           % vector of boundary condition forces
+
 %% -----------------------------------------------------------------------------
 % Calculate boundary displacement at the inner and outer surface of each rim
 % ------------------------------------------------------------------------------
-b = 1;
-
-for k = 1:length(rim)-1
-  Q11 = mat.Q{b,k}(1,1);
-  Q13 = mat.Q{b,k}(1,3);
-  Q33 = mat.Q{b,k}(3,3);
+for k = 1:numRims
+  rim = rotor.radii{k};
+  Q11 = rotor.Q{k}(1,1);
+  Q13 = rotor.Q{k}(1,3);
+  Q33 = rotor.Q{k}(3,3);
   kappa = sqrt(Q11/Q33);
 
   % intermediate variables for calculating the stiffness matrix
   fi0 = 1/(Q33 * (9 - kappa^2));
   fi3 = (3 * Q33 + Q13) / (Q33 * (9 - kappa^2));
 
-  z = rim(k)/rim(k+1);
+  z = rim(1)/rim(2);
   z1 = z^-kappa + z^kappa;
   z2 = z^-kappa - z^kappa;
 
@@ -52,8 +52,8 @@ for k = 1:length(rim)-1
   % Global stiffness matrix for the entire
   K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
 
-  fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
-  uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
+  fsig = -(rotor.rho(k))*w^2*fi3*[-rim(1)^3; rim(2)^3];
+  uw = -(rotor.rho(k))*w^2*fi0*[rim(1)^3; rim(2)^3];
 
   fw = -fsig + kMat*uw;
   Fw(k:k+1) = Fw(k:k+1) + fw;
@@ -62,10 +62,10 @@ for k = 1:length(rim)-1
 end
 
 % Force from external pressure applied to inner and outer surface of the rim
-Fb(1) = -rim(1)*sigb(1);
-Fb(end) = rim(end)*sigb(end);
+Fb(1) = -rotor.radii{1}(1)*sigb(1);
+Fb(end) = rotor.radii{end}(2)*sigb(end);
 % Displacement at the inner and outer radius of each rim
-U(b,:) = K \ (Fb + Fw + Fd);
+U(:) = K \ (Fb + Fw + Fd);
 
 % Reset matrix values
 K = K .* 0;
