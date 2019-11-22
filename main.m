@@ -21,7 +21,7 @@ st = 'pe';
 Ftype = 'MaxR'; % Options: TsaiWu, MaxR
 
 % Rotor
-rim = [.10, .110, 0.17];
+rim = [.10, .110, 0.17]; % rim radii in [m]
 rdiv = 30; % number of points per rim to analyze
 delta = [0.4, 0]/1000; % [mm]
 sigb = [0, 0];
@@ -36,6 +36,8 @@ startime = 1;
 
 % Velocity
 iRPM = 38000; % Initial rpm
+dThicc = 0.0015; % Damaged ring thickness [m]
+degStiffPerc = 0.01; % Degraded stiffness percent
 vdiv = 1; % number of points to analyze between each fixed velocity
 failure = false;
 
@@ -147,14 +149,37 @@ mat.Q = cell(vari,length(mats));
 fprintf('Preallocate Memory: Complete\n')
 
 %% -----------------------------------------------------------------------------
-%  Current time and velocity
+%  Create Q matrices for all materials
 %  -----------------------------------------------------------------------------
+b = 1;
+
+for k = 1:length(mats)
+  mat.file{k} = ['MaterialProperties\', mats{k}];
+  matProp = load(mat.file{k});
+  mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
+  mat.rho{k} = matProp.rho;
+
+  try
+    mat.stren{k} = matProp.stren;
+  catch
+    if ~strcmp(Ftype, 'none')
+      error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
+    end
+    break
+  end
+end
+
+fprintf('Create Material Property Matrices: Complete\n')
+
 iter = 0; % 0 corresponds to the initial starting time and velocity. This might change to vari when incorporating VE behavior
 
 while ~failure
-  cRPM = iRPM + 1*iter;
+%% -----------------------------------------------------------------------------
+%  Current time and velocity
+%  -----------------------------------------------------------------------------
+  cRPM = iRPM + 10*iter;
   w = (pi/30) * cRPM;
-  
+
   fprintf('Faiure = %f\n', failure);
   fprintf('Iteration = %f\n', iter);
   fprintf('cRPM = %f\n\n', cRPM)
@@ -163,28 +188,7 @@ while ~failure
 %     fprintf('Program Ended\n');
 %     return
 %   end
-%% -----------------------------------------------------------------------------
-%  Create Q matrices for all materials
-%  -----------------------------------------------------------------------------
-  b = 1;
 
-  for k = 1:length(mats)
-    mat.file{k} = ['MaterialProperties\', mats{k}];
-    matProp = load(mat.file{k});
-    mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
-    mat.rho{k} = matProp.rho;
-
-    try
-      mat.stren{k} = matProp.stren;
-    catch
-      if ~strcmp(Ftype, 'none')
-        error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
-      end
-      break
-    end
-  end
-
-  fprintf('Create Material Property Matrices: Complete\n')
 %% -----------------------------------------------------------------------------
 %  Displacement of rim surfaces
 %  -----------------------------------------------------------------------------
@@ -217,8 +221,17 @@ while ~failure
   if ~strcmp(Ftype, 'none')
       [failure, ~, Fmode, Floc] = failureIndex(Ftype);
       fprintf('Failure Analysis: Complete\n');
-      
+      [newRotor, rimInd] = degradeRotor(Floc, dThicc);
+
+      mat.file = ['MaterialProperties\', mats{rimInd}];
+      matProp = load(mat.file);
+      matProp.mstiff(2) = degStiffPerc * matProp.mstiff(2);
+      ringStiff = stiffMat(matProp.mstiff, compFunc);
+      ringRho = matProp.rho;
+      ringStren = matProp.stren;
+      %Integrate ring stiffness, density, and strength into the larger mat structure.
   end
+
   iter = iter + 1;
 end
 %% -----------------------------------------------------------------------------
