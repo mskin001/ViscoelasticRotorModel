@@ -6,7 +6,7 @@ close('all','force')
 %  Define global variables
 %  -----------------------------------------------------------------------------
 % Global variables and arrays
-global U w rim arraySize rArr uArr sArr eArr t vari
+global U w rim arraySize rArr uArr sArr eArr rdiv vari
 % Global structures
 global mat plotWhat
 
@@ -18,45 +18,42 @@ global mat plotWhat
   % ve = steady state viscoelastic
 
 st = 'pe';
-Ftype = 'TsaiWu'
+Ftype = 'MaxR'; % Options: TsaiWu, MaxR
 
 % Rotor
-% rim = [0.03789; 0.07901]; % single rim Ha 1999
-% rim = [0.110, 0.2];
 rim = [.10, .110, 0.17];
-% rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0.4, 0]/1000; % [mm]
 sigb = [0, 0];
 mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999.mat'};
-% mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
-
-% Time/creep
-simTime = 10e10;
-timeUnit = 's'; % s = sec, h = hours, d = days
-numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
-% Speed/velocity
-rpm = 20000;
+% Time
+simTime = 1;
+timeUnit = 's'; % s = sec, h = hours, d = days
+numberOfSteps = 3;
+startime = 1;
+
+% Velocity
+iRPM = 38000; % Initial rpm
 vdiv = 1; % number of points to analyze between each fixed velocity
+failure = false;
 
 % Plotting
 plotWhat.rims = rim;
 plotWhat.custom1 = 'no';
 
+plotWhat.radDis = 'no';         % Radial displacement v. radius
+plotWhat.radStr = 'no';         % Radial stress v. radius
+plotWhat.hoopStr = 'no';        % Hoop stress v. radius
+plotWhat.strengthRatio = 'no';   % Strength Ratio v. radius
+
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'yes';
-
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
-plotWhat.radStr = 'yes';         % Radial stress v. radius plot
-
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
-plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
-
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
                                  %   0 is fastest
@@ -64,13 +61,13 @@ plotWhat.delay = 0;              % Time delay in seconds between frames in the g
 %% -----------------------------------------------------------------------------
 %  Start Program
 %  -----------------------------------------------------------------------------
-fprintf('Material Behavior: %s\n',st)
-fprintf('Failure Model: %s\n', Ftype)
+fprintf('Material behavior: %s\n',st)
+fprintf('Failure model: %s\n', Ftype)
 fprintf('Simulation time: %1.0f %s\n',simTime,timeUnit)
 fprintf('Number of rims: %1.0f\n',length(rim)-1)
-fprintf('Material Selections: %s\n', mats{1:end})
-% fprintf('                     %s\n', mats{2:end})
-fprintf('Rotational velocity: %1.0f rpm\n\n', rpm)
+fprintf('Material selections: %s\n', mats{1})
+fprintf('                     %s\n', mats{2:end})
+fprintf('Initial rotational velocity: %1.0f rpm\n\n', iRPM)
 fprintf('Program Start: \n')
 
 %% -----------------------------------------------------------------------------
@@ -99,7 +96,7 @@ if strcmp(st,'pe')
   simTime = 1; % steady state = not time changes
   compFunc = 'no'; % Redefineds compFunc to reflect a constant elastic matrix
 
-  if length(rpm) > 1
+  if length(iRPM) > 1
     error('Rotational velocity not specified. Please specify a single veloctiy\n')
   end
 
@@ -148,26 +145,46 @@ mat.file = cell(length(mats),1);
 mat.Q = cell(vari,length(mats));
 
 fprintf('Preallocate Memory: Complete\n')
+
+%% -----------------------------------------------------------------------------
+%  Current time and velocity
+%  -----------------------------------------------------------------------------
+iter = 0; % 0 corresponds to the initial starting time and velocity. This might change to vari when incorporating VE behavior
+
+while ~failure
+  cRPM = iRPM + 1*iter;
+  w = (pi/30) * cRPM;
+  
+  fprintf('Faiure = %f\n', failure);
+  fprintf('Iteration = %f\n', iter);
+  fprintf('cRPM = %f\n\n', cRPM)
+%   cont = input('Would you like to contine? ');
+%   if ~cont
+%     fprintf('Program Ended\n');
+%     return
+%   end
 %% -----------------------------------------------------------------------------
 %  Create Q matrices for all materials
 %  -----------------------------------------------------------------------------
-for k = 1:length(mats)
-  mat.file{k} = ['MaterialProperties\', mats{k}];
-  matProp = load(mat.file{k});
-  mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
-  mat.rho{k} = matProp.rho;
+  b = 1;
 
-  try
-    mat.stren{k} = matProp.stren;
-  catch
-    if ~strcmp(Ftype, 'none')
-      error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
+  for k = 1:length(mats)
+    mat.file{k} = ['MaterialProperties\', mats{k}];
+    matProp = load(mat.file{k});
+    mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
+    mat.rho{k} = matProp.rho;
+
+    try
+      mat.stren{k} = matProp.stren;
+    catch
+      if ~strcmp(Ftype, 'none')
+        error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
+      end
+      break
     end
-    break
   end
-end
 
-fprintf('Create Material Property Matrices: Complete\n')
+  fprintf('Create Material Property Matrices: Complete\n')
 %% -----------------------------------------------------------------------------
 %  Displacement of rim surfaces
 %  -----------------------------------------------------------------------------
@@ -176,9 +193,9 @@ fprintf('Create Material Property Matrices: Complete\n')
 % output of force vector results. These can be important for debugging and
 % verification purposes, but are not necessary for the program. Check function
 % discription for mor info
-[~, ~, ~, ~] = boundaryConditions(sigb, delta);
+  [~, ~, ~, ~] = boundaryConditions(sigb, delta);
 
-fprintf('Calculate Boundary Conditions: Complete\n')
+  fprintf('Calculate Boundary Conditions: Complete\n')
 %% -----------------------------------------------------------------------------
 %  Rotor stress strain calculations
 %  -----------------------------------------------------------------------------
@@ -186,9 +203,9 @@ fprintf('Calculate Boundary Conditions: Complete\n')
 % used to the [C] matrix output. This is useful for debugging and
 % verification purposes but not necessary for the function. Check function
 % description for mor info
-[~] = discretizeStressStrain(rdiv, delta);
+  [~] = discretizeStressStrain(delta);
 
-fprintf('Descretize Stress/Strain: Complete\n')
+  fprintf('Descretize Stress/Strain: Complete\n')
 %% -----------------------------------------------------------------------------
 %  Failure behavior and locations
 %  -----------------------------------------------------------------------------
@@ -197,14 +214,17 @@ fprintf('Descretize Stress/Strain: Complete\n')
 % and identifies the failure location. Outputs determine if the simulation
 % should continue or end.
 
-if ~strcmp(Ftype, 'none')
-    [Fmode, failureIndex, Floc] = failureIndex(Ftype);
+  if ~strcmp(Ftype, 'none')
+      [failure, ~, Fmode, Floc] = failureIndex(Ftype);
+      fprintf('Failure Analysis: Complete\n');
+      
+  end
+  iter = iter + 1;
 end
-
 %% -----------------------------------------------------------------------------
 %  Make Plots
 %  -----------------------------------------------------------------------------
-plotStressStrain()
+  plotStressStrain()
 
 fprintf('Create Output Plots: Complete\n\n')
 fprintf('Program Complete\n')

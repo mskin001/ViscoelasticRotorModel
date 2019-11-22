@@ -1,4 +1,4 @@
-function [C] = discretizeStressStrain(rdiv, delta)
+function [C] = discretizeStressStrain(delta)
 % This function calculates a discrete vector of stress and strain in each rim of
 % the rotor. It uses the boundary conditions for each rim caulculated in the
 % function boundaryConditions to find the C constants. These are then used to
@@ -20,11 +20,12 @@ function [C] = discretizeStressStrain(rdiv, delta)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global mat rim U w rArr uArr sArr eArr vari
+global mat rim U w rArr uArr sArr eArr rdiv
 
 %% -----------------------------------------------------------------------------
 % Calculate stress, strain, displacement for each rim
 % ------------------------------------------------------------------------------
+b = 1;
 
 for k = 1:length(rim)-1
   Q11 = mat.Q{b,k}(1,1);

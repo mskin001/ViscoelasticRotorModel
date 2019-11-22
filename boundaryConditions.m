@@ -20,7 +20,7 @@ function [Fw, Fd, Fb, K] = boundaryConditions(sigb, delta)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global U rim w mat arraySize vari
+global U rim w mat arraySize
 
 K = zeros(arraySize,arraySize);    % global stiffness matrix
 Fw = zeros(arraySize,1);           % vector of centrifugal forces
@@ -29,6 +29,8 @@ Fb = zeros(arraySize,1);           % vector of boundary condition forces
 %% -----------------------------------------------------------------------------
 % Calculate boundary displacement at the inner and outer surface of each rim
 % ------------------------------------------------------------------------------
+b = 1;
+
 for k = 1:length(rim)-1
   Q11 = mat.Q{b,k}(1,1);
   Q13 = mat.Q{b,k}(1,3);
