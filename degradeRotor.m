@@ -22,4 +22,11 @@ ringPos = failRimPos + 1;
 newOuterRadii = [ringOuter, rotor.radii{failRimPos}(2)];
 newOuterPos = failRimPos + 2;
 
-rotor.pos(failRimPos+1:end+2) = [ringPos, rotor.pos(failRimPos:end)+2];
+rotor.pos(failRimPos:end) = rotor.pos(failRimPos:end)+2;
+rotor.pos(end+1:end+2) = [failRimPos, ringPos];
+[rotor.pos,ind] = sort(rotor.pos);
+
+
+rotor.Q{ringPos+1} = rotor.Q{ringPos-1};
+rotor.rho(ringPos+1) = rotor.rho(ringPos-1);
+rotor.stren{ringPos+1} = rotor.stren{ringPos-1};

@@ -21,11 +21,11 @@ st = 'pe';
 Ftype = 'MaxR'; % Options: TsaiWu, MaxR
 
 % Rotor
-rim = [.10, .110, 0.19, 0.2]; % rim radii in [m]
+rim = [.10, .110, 0.17]; % rim radii in [m]
 rdiv = 30; % number of points per rim to analyze
-delta = [0.4, 0.4, 0]/1000; % [mm]
+delta = [0.4, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999', 'IM7_8552_Tzeng2001.mat'};
+mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999'};
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Time
@@ -35,7 +35,7 @@ numberOfSteps = 3;
 startime = 1;
 
 % Velocity
-iRPM = 34000; % Initial rpm
+iRPM = 38600; % Initial rpm
 dThicc = 0.0015; % Damaged ring thickness [m]
 degStiffPerc = 0.01; % Degraded stiffness percent
 vdiv = 1; % number of points to analyze between each fixed velocity
