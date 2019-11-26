@@ -231,20 +231,6 @@ while ~failure
   if ~strcmp(Ftype, 'none')
     [failure, ~, Fmode, Floc] = failureIndex(Ftype);
     fprintf('Failure Analysis: Complete\n');
-    
-%
-%     mat.file = ['MaterialProperties\', mats{rimInd}];
-%     ringProps = load(mat.file);
-%     ringProps.mstiff(2) = degStiffPerc * matProp.mstiff(2);
-%     ringStiff = stiffMat(ringProps.mstiff, compFunc);
-%     ringRho = ringProps.rho;
-%     ringStren = rinProps.stren;
-%
-%     tempQ = cell(1,length(newRotor));
-%     tempQ{1:rimInd+2} = {mat.Q{1:rimInd}, ringStiff, mat.Q{rimInd}};
-%     tempQ{rimInd+2} = {mat.Q{rimInd}};
-
-    %Integrate ring stiffness, density, and strength into the larger mat structure.
   else
       failure = 1; % When not evaluating failure, set to 1 to iterate exactly once.
   end
