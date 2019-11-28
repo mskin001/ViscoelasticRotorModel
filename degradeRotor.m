@@ -22,7 +22,7 @@ ringPos = failRimPos + 1;
 newOuterRadii = [ringOuter, rotor.radii{failRimPos}(2)];
 newOuterPos = failRimPos + 2;
 
-% Parse failed rim into damaged and undamaged sections - treated as new rims
+% Cut failed rim into damaged and undamaged sections - treated as new rims
 rotor.pos(failRimPos:end) = rotor.pos(failRimPos:end)+2;
 rotor.pos(end+1:end+2) = [failRimPos, ringPos];
 rotor.pos = sort(rotor.pos);
@@ -32,6 +32,7 @@ rotor.radii{newInnerPos} = newInnerRadii;
 rotor.radii{ringPos} = ringRadii;
 rotor.radii{newOuterPos} = newOuterRadii;
 
+% Define material properties for new rims
 rotor.Q{newOuterPos} = rotor.Q{newInnerPos};
 rotor.rho(newOuterPos) = rotor.rho(newInnerPos);
 rotor.stren{newOuterPos} = rotor.stren{newInnerPos};
@@ -45,3 +46,7 @@ baseProps.mstiff(2) = degStiffPerc * baseProps.mstiff(2);
 rotor.Q{ringPos} = stiffMat(baseProps.mstiff,'no'); % 'no' to disable VE part of stiffMat
 rotor.rho(ringPos) = baseProps.rho;
 rotor.stren{ringPos} = baseProps.stren;
+
+% Lable intact and failed rims
+rotor.intact = ones(length(rotor.radii));
+rotor.intact(ringPos) = 0
