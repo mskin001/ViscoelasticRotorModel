@@ -18,14 +18,14 @@ global plotWhat rotor
   % ve = steady state viscoelastic
 
 st = 'pe';
-Ftype = 'MaxR'; % Options: TsaiWu, MaxR
+Ftype = 'none'; % Options: TsaiWu, MaxR
 
 % Rotor
-rim = [.10, .110, 0.18, 0.2]; % rim radii in [m]
+rim = [0.0000001, .055, 0.080]; % rim radii in [m]
 rdiv = 30; % number of points per rim to analyze
-delta = [0.4, 0.4, 0]/1000; % [mm]
+delta = [0.175, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999', 'IM7_8552_Tzeng2001'};
+mats = {'Al7075T651_Corbin2005.mat','G30-500_8604_Corbin2005.mat'};
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Time
@@ -35,7 +35,7 @@ numberOfSteps = 3;
 startime = 1;
 
 % Velocity
-iRPM = 38600; % Initial rpm
+iRPM = 65000; % Initial rpm
 dThicc = 0.0015; % Damaged ring thickness [m]
 degStiffPerc = 0.01; % Degraded stiffness percent
 vdiv = 1; % number of points to analyze between each fixed velocity
@@ -46,9 +46,9 @@ Fmode = 'none';
 plotWhat.rims = rim;
 plotWhat.custom1 = 'no';
 
-plotWhat.radDis = 'no';         % Radial displacement v. radius
-plotWhat.radStr = 'no';         % Radial stress v. radius
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius
+plotWhat.radDis = 'yes';         % Radial displacement v. radius
+plotWhat.radStr = 'yes';         % Radial stress v. radius
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius
 plotWhat.strengthRatio = 'no';   % Strength Ratio v. radius
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
@@ -240,8 +240,9 @@ while ~strcmp('Burst',Fmode)
     iter = iter + 1;
   end
   
-  [delta] = degradeRotor(rim, Floc, dThicc, degStiffPerc, mat, delta);
-
+  if ~strcmp('Burst',Fmode)
+    [delta] = degradeRotor(rim, Floc, dThicc, degStiffPerc, mat, delta);
+  end
   
   results.rotor{1,1} = rotor;
   results.rArr{1,1} = rArr;

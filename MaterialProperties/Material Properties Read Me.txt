@@ -9,5 +9,5 @@ rho = % density. You must specify a density in the material's workspace.
 stren = [Longitudinal Tensile, Longitudinal Compressive, Transversie Tensile, Transverse Compressive, Longitudinal Shear]
 % This field is not strictly necessary for the operation of the program, can be left blank if desired.
 
-MS_verified = %can be either yes or no. 
+verified = %can be either yes or no. 
 % Yes indicates I have verified the material properties are correct based on information available at the creation of the file. No does not mean the properties are wrong, but that I have not personally verified them.
