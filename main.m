@@ -18,7 +18,7 @@ global plotWhat rotor
   % ve = steady state viscoelastic
 
 st = 'pe';
-Ftype = 'none'; % Options: TsaiWu, MaxR
+Ftype = 'MaxR'; % Options: TsaiWu, MaxR
 
 % Rotor
 rim = [0.0000001, .055, 0.080]; % rim radii in [m]
