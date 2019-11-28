@@ -27,7 +27,7 @@ rotor.pos(failRimPos:end) = rotor.pos(failRimPos:end)+2;
 rotor.pos(end+1:end+2) = [failRimPos, ringPos];
 rotor.pos = sort(rotor.pos);
 
-rotor.radii{newOuterPos:end+2} = rotor.radii{failRimPos:end};
+rotor.radii(newOuterPos:end+2) = rotor.radii(failRimPos:end);
 rotor.radii{newInnerPos} = newInnerRadii;
 rotor.radii{ringPos} = ringRadii;
 rotor.radii{newOuterPos} = newOuterRadii;

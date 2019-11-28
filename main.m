@@ -21,11 +21,11 @@ st = 'pe';
 Ftype = 'MaxR'; % Options: TsaiWu, MaxR
 
 % Rotor
-rim = [.10, .110, 0.17]; % rim radii in [m]
+rim = [.10, .110, 0.18, 0.2]; % rim radii in [m]
 rdiv = 30; % number of points per rim to analyze
-delta = [0.4, 0]/1000; % [mm]
+delta = [0.4, 0.4, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999'};
+mats = {'Alumin_7075_t6.mat','Glass_Epoxy_Ha1999', 'IM7_8552_Tzeng2001'};
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Time
@@ -239,9 +239,10 @@ while ~strcmp('Burst',Fmode)
 
     iter = iter + 1;
   end
-
+  
   [delta] = degradeRotor(rim, Floc, dThicc, degStiffPerc, mat, delta);
 
+  
   results.rotor{1,1} = rotor;
   results.rArr{1,1} = rArr;
   results.uArr{1,1} = uArr;
