@@ -40,6 +40,7 @@ dThicc = 0.0015; % Damaged ring thickness [m]
 degStiffPerc = 0.01; % Degraded stiffness percent
 vdiv = 1; % number of points to analyze between each fixed velocity
 failure = false;
+Fmode = 'none';
 
 % Plotting
 plotWhat.rims = rim;
@@ -137,14 +138,6 @@ fprintf('Check Input Variables: Complete\n')
 %  Preallocate variables
 %  -----------------------------------------------------------------------------
 numRims = length(rim)-1;
-arraySize = length(rim); % Intermediate variable
-
-U = zeros(1,arraySize);
-rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
-uArr = zeros(1,(arraySize-1)*rdiv);    % displacement vector for discretization
-sArr = zeros(4,(arraySize-1)*rdiv);    % stress vector
-eArr = zeros(4, rdiv);    % strain vector in each direction
-
 rotor = struct();
 rotor.pos = zeros(1, numRims);
 rotor.radii = cell(1, numRims);
@@ -183,66 +176,86 @@ end
 fprintf('Create Material Property Matrices: Complete\n')
 
 iter = 0; % 0 corresponds to the initial starting time and velocity. This might change to vari when incorporating VE behavior
-while ~failure
-% -----------------------------------------------------------------------------
-%  Current time and velocity
-%  -----------------------------------------------------------------------------
-  cRPM = iRPM + 1*iter;
-  w = (pi/30) * cRPM;
+while ~strcmp('Burst',Fmode)
+  arraySize = numRims+1; % Intermediate variable
+  U = zeros(1,arraySize);
+  rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
+  uArr = zeros(1,(arraySize-1)*rdiv);    % displacement vector for discretization
+  sArr = zeros(4,(arraySize-1)*rdiv);    % stress vector
+  eArr = zeros(4, rdiv);    % strain vector in each direction
+  
+  while ~failure
+  % -----------------------------------------------------------------------------
+  %  Current time and velocity
+  %  -----------------------------------------------------------------------------
+    cRPM = iRPM + 1*iter;
+    w = (pi/30) * cRPM;
 
-  fprintf('Faiure = %f\n', failure);
-  fprintf('Iteration = %f\n', iter);
-  fprintf('cRPM = %f\n\n', cRPM)
-%   cont = input('Would you like to contine? ');
-%   if ~cont
-%     fprintf('Program Ended\n');
-%     return
-%   end
+    fprintf('Faiure = %f\n', failure);
+    fprintf('Iteration = %f\n', iter);
+    fprintf('cRPM = %f\n\n', cRPM)
+  %   cont = input('Would you like to contine? ');
+  %   if ~cont
+  %     fprintf('Program Ended\n');
+  %     return
+  %   end
 
-%% -----------------------------------------------------------------------------
-%  Displacement of rim surfaces
-%  -----------------------------------------------------------------------------
-% Calculate displacement magnitude at the inner and outer surface of each rim
-% these are used as boundary conditions to find C. ~ is used to disregard
-% output of force vector results. These can be important for debugging and
-% verification purposes, but are not necessary for the program. Check function
-% discription for mor info
-  [~, ~, ~, ~] = boundaryConditions(sigb, delta);
+  %% -----------------------------------------------------------------------------
+  %  Displacement of rim surfaces
+  %  -----------------------------------------------------------------------------
+  % Calculate displacement magnitude at the inner and outer surface of each rim
+  % these are used as boundary conditions to find C. ~ is used to disregard
+  % output of force vector results. These can be important for debugging and
+  % verification purposes, but are not necessary for the program. Check function
+  % discription for mor info
+    [~, ~, ~, ~] = boundaryConditions(sigb, delta);
 
-  fprintf('Calculate Boundary Conditions: Complete\n')
-%% -----------------------------------------------------------------------------
-%  Rotor stress strain calculations
-%  -----------------------------------------------------------------------------
-% Calculate discrete displacement, stain, and stress for each rim ~ here is
-% used to the [C] matrix output. This is useful for debugging and
-% verification purposes but not necessary for the function. Check function
-% description for mor info
-  [~] = discretizeStressStrain(delta);
+    fprintf('Calculate Boundary Conditions: Complete\n')
+  %% -----------------------------------------------------------------------------
+  %  Rotor stress strain calculations
+  %  -----------------------------------------------------------------------------
+  % Calculate discrete displacement, stain, and stress for each rim ~ here is
+  % used to the [C] matrix output. This is useful for debugging and
+  % verification purposes but not necessary for the function. Check function
+  % description for mor info
+    [~] = discretizeStressStrain(delta);
 
-  fprintf('Descretize Stress/Strain: Complete\n')
-%% -----------------------------------------------------------------------------
-%  Failure behavior and locations
-%  -----------------------------------------------------------------------------
-% Failure index and type calculations. Calcuates the failure index using the
-% selected faliure modes, determines the type of failure (cracking or burst),
-% and identifies the failure location. Outputs determine if the simulation
-% should continue or end.
+    fprintf('Descretize Stress/Strain: Complete\n')
+  %% -----------------------------------------------------------------------------
+  %  Failure behavior and locations
+  %  -----------------------------------------------------------------------------
+  % Failure index and type calculations. Calcuates the failure index using the
+  % selected faliure modes, determines the type of failure (cracking or burst),
+  % and identifies the failure location. Outputs determine if the simulation
+  % should continue or end.
 
-  if ~strcmp(Ftype, 'none')
-    [failure, ~, Fmode, Floc] = failureIndex(Ftype);
-    fprintf('Failure Analysis: Complete\n');
-  else
-      failure = 1; % When not evaluating failure, set to 1 to iterate exactly once.
+    if ~strcmp(Ftype, 'none')
+      [failure, ~, Fmode, Floc] = failureIndex(Ftype);
+      fprintf('Failure Analysis: Complete\n');
+    else
+        failure = 1; % When not evaluating failure, set to 1 to iterate exactly once.
+        Fmode = 'Burst';
+    end
+
+    iter = iter + 1;
   end
 
-  iter = iter + 1;
+  [delta] = degradeRotor(rim, Floc, dThicc, degStiffPerc, mat, delta);
+
+  results.rotor{1,1} = rotor;
+  results.rArr{1,1} = rArr;
+  results.uArr{1,1} = uArr;
+  results.sArr{1,1} = sArr;
+
+  failure = 0;
+  numRims = length(rotor.radii);
 end
 
-[newRotor, rimInd] = degradeRotor(rim, Floc, dThicc);
+
 %% -----------------------------------------------------------------------------
 %  Make Plots
 %  -----------------------------------------------------------------------------
-  plotStressStrain()
+plotStressStrain()
 
 fprintf('Create Output Plots: Complete\n\n')
 fprintf('Program Complete\n')
