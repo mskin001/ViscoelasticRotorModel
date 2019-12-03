@@ -8,45 +8,32 @@ function [delta] = degradeRotor(rim, Floc, dThicc, degStiffPerc, mat, delta)
 
 global rotor
 
-fpos = find(((rim - Floc) > 0),1); % index location of for the outer radius of the failed rim
-failRimPos = fpos - 1; % position of the failed rim in the rotor
+fpos = find((rim > Floc),1); % index location of for the outer radius of the failed rim
+innerPos = fpos - 1; % position of the failed rim in the rotor
 
 ringInner = Floc - dThicc/2; % Inner radius of degraded ring
 ringOuter = Floc + dThicc/2; % Outer radius of degraded ring
 
-% Dimension and position of each new rim made from dividing the origional failed rim.
-newInnerRadii = [rotor.radii{failRimPos}(1), ringInner];
-newInnerPos = failRimPos;
-ringRadii = [ringInner, ringOuter]; % Degrated ring radii. This vector will always be size [1,2]
+% Dimension and position of each new rim made from segmenting the origional
+innerPos = failRimPos;
 ringPos = failRimPos + 1;
-newOuterRadii = [ringOuter, rotor.radii{failRimPos}(2)];
-newOuterPos = failRimPos + 2;
+outerPos = failRimPos + 2;
 
-% Cut failed rim into damaged and undamaged sections - treated as new rims
-rotor.pos(failRimPos:end) = rotor.pos(failRimPos:end)+2;
-rotor.pos(end+1:end+2) = [failRimPos, ringPos];
-rotor.pos = sort(rotor.pos);
+innerRadii = [rotor.radii{failRimPos}(1), ringInner];
+ringRadii = [ringInner, ringOuter]; % Degrated ring radii. This vector will always be size [1,2]
+outerRadii = [ringOuter, rotor.radii{failRimPos}(2)];
 
-rotor.radii(newOuterPos:end+2) = rotor.radii(failRimPos:end);
-rotor.radii{newInnerPos} = newInnerRadii;
+rotor.radii(outerPos:end+2) = rotor.radii(failRimPos:end);
+rotor.radii{innerPos} = innerRadii;
 rotor.radii{ringPos} = ringRadii;
-rotor.radii{newOuterPos} = newOuterRadii;
+rotor.radii{outerPos} = outerRadii;
 
-% Define material properties for new rims
-rotor.Q{newOuterPos} = rotor.Q{newInnerPos};
-rotor.rho(newOuterPos) = rotor.rho(newInnerPos);
-rotor.stren{newOuterPos} = rotor.stren{newInnerPos};
-
-delta(newOuterPos:end+2) = delta(newInnerPos:end);
-delta(newInnerPos:newOuterPos) = 0;
-
-% Assign material properties for the degraded ring
-baseProps = load(mat.file{failRimPos});
-baseProps.mstiff(2) = degStiffPerc * baseProps.mstiff(2);
-rotor.Q{ringPos} = stiffMat(baseProps.mstiff,'no'); % 'no' to disable VE part of stiffMat
-rotor.rho(ringPos) = baseProps.rho;
-rotor.stren{ringPos} = baseProps.stren;
+delta(outerPos:end+2) = delta(innerPos:end);
+delta(innerPos:outerPos) = 0;
 
 % Lable intact and failed rims
 rotor.intact = ones(length(rotor.radii));
 rotor.intact(ringPos) = 0
+
+rotor.matInd(outerPos) = rotor.matInd(innerPos);
+rotor.matInd(ringPos) = rotor.matInd(outerPos);

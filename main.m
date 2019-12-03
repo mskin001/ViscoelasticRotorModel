@@ -148,14 +148,9 @@ rotor.intact = ones(1,numRims); % '1' indicates the rim is intact. All rims init
 
 fprintf('Preallocate Memory: Complete\n')
 
-%% -----------------------------------------------------------------------------
-%  Create Q matrices and proprogate rotor structures
-%  -----------------------------------------------------------------------------
 for k = 1:numRims
   rotor.radii{k} = [rim(k),rim(k+1)];
 end
-
-fprintf('Create Material Property Matrices: Complete\n')
 
 iter = 0; % 0 corresponds to the initial starting time and velocity. This might change to vari when incorporating VE behavior
 while ~strcmp('Burst',Fmode)
@@ -169,28 +164,37 @@ while ~strcmp('Burst',Fmode)
   while ~failure
   % -----------------------------------------------------------------------------
   %  Current time and velocity
-  %  -----------------------------------------------------------------------------
+  %  ---------------------------------------------------------------------------
     cRPM = iRPM + 1*iter;
     w = (pi/30) * cRPM;
+
+    %% -------------------------------------------------------------------------
+    %  Create Q matrices and proprogate rotor structures
+    %  -------------------------------------------------------------------------
     for k = 1:numRims
+      matFile = ['MaterialProperties\', mats{rotor.matInd(k)}];
+      matProp = load(matFile);
+      rotor.rho(k) = matProp.rho;
+
       if rotor.intact(k)
-        matFile = ['MaterialProperties\', mats{rotor.matInd(k)}];
-        matProp = load(matFile);
         rotor.Q{k} = stiffMat(matProp.mstiff, compFunc);
-        rotor.rho(k) = matProp.rho;
-        try
-          rotor.stren{k} = matProp.stren;
-        catch
-          if ~strcmp(Ftype, 'none')
-            error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
-          else
-          warning('Yield strength not specified for this material')
-          fprintf('%s\n', mats{k});
-          end
-        end
       else
         % Do something for broken rims
+        matProp.mstiff(2) = degStiffPerc * matProp.mstiff(2);
+        rotor.Q{k} = stiffMat(matProp.mstiff, 'no');
       end
+
+      try
+        rotor.stren{k} = matProp.stren;
+      catch
+        if ~strcmp(Ftype, 'none')
+          error('Yield Strength for one or more materials is not specified. Can not complete the selected simulation.')
+        else
+        warning('Yield strength not specified for this material')
+        fprintf('%s\n', mats{k});
+        end
+      end
+
     end
 
     %% -----------------------------------------------------------------------------
