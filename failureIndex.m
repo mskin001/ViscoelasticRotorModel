@@ -34,14 +34,14 @@ Fmode = 'Radial';
 
 if strcmp(Ftype, 'TsaiWu')
   % Calculates failure index based on Tsai-Wu failure criterion
-  for k = 1:length(rim) - 1
+  for k = 1:numRims
     rvstart = (k-1)*rdiv + 1;
     rvend = k*rdiv;
 
-    LgTens = mat.stren{k}(1);
-    LgComp = mat.stren{k}(2);
-    TranTens = mat.stren{k}(3);
-    TranComp = mat.stren{k}(4);
+    LgTens = rotor.stren{k}(1);
+    LgComp = rotor.stren{k}(2);
+    TranTens = rotor.stren{k}(3);
+    TranComp = rotor.stren{k}(4);
 
     Ftt = 1/(LgTens*LgComp);
     Ft = 1/LgTens - 1/LgComp;
@@ -49,22 +49,23 @@ if strcmp(Ftype, 'TsaiWu')
     Fr = 1/TranTens - 1/TranComp;
     Ftr = -1/(2*sqrt(LgTens*LgComp*TranTens*TranComp));
 
-    a = Ftt*sArr(1,rvstart:rvend,1).^2 + 2*Ftr*sArr(1,rvstart:rvend,1).*sArr(3,rvstart:rvend,1) + Frr*sArr(3,rvstart:rvend,1).^2;
-    b = Ft*sArr(1,rvstart:rvend,1) + Fr*sArr(3,rvstart:rvend,1);
+    a = Ftt*sArr(1,rvstart:rvend).^2 + 2*Ftr*sArr(1,rvstart:rvend).*sArr(3,rvstart:rvend)...
+      + Frr*sArr(3,rvstart:rvend).^2;
+    b = Ft*sArr(1,rvstart:rvend) + Fr*sArr(3,rvstart:rvend);
 
-    R1(rvstart:rvend) = (-b + sqrt(b.^2 - 4*a.*c))/(2*a);
-    R2(rvstart:rvend) = (-b - sqrt(b.^2 - 4*a.*c))/(2*a);
+    R1(rvstart:rvend) = (-b + sqrt(b.^2 - 4*a.*(-1)))/(2*a);
   end
 
-  if all(R1 >= 0)
-    strengthRatio = R1;
-    disp('failureIndex is R1');
-  elseif all(R2 >= 0)
-    strengthRatio = R2;
-    disp('failureIndex is R2');
+  strengthRatio = R1.^-1;
+  if sum(strengthRatio >= 1)
+    failure = 1;
+    Floc = find(strengthRatio>1, 1);
+  else
+    failure = 0;
+    Fmode = 'none';
+    Floc = 0;
+    strengthRatio = 0;
   end
-
-  Floc = rArr(strengthRatio);
 
 elseif strcmp(Ftype, 'MaxR')
   % Failure index based on maximum radial Stress
@@ -80,13 +81,13 @@ elseif strcmp(Ftype, 'MaxR')
     tRadFail = rArr(tfi);
     strengthRatio = 1; % Still need to work on this. Compressive or tensile failure? Both? Under construction
     Floc = [cRadFail, tRadFail];
-    failure = true;
+    failure = 1;
     plot(rArr,sArr(3,:));
     hold on
     plot(cRadFail, sArr(3,cfi), 'r*')
     plot(tRadFail, sArr(3,tfi), 'b*')
   else % If no failure occures
-    failure = false;
+    failure = 0;
     Fmode = 'none';
     Floc = 0;
     strengthRatio = 0;

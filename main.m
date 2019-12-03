@@ -17,7 +17,7 @@ global plotWhat rotor
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
 st = 'pe';
-Ftype = 'MaxR'; % Options: TsaiWu, MaxR
+Ftype = 'TsaiWu'; % Options: TsaiWu, MaxR
 
 % Rotor
 rim = [0.0000001, .055, 0.080]; % rim radii in [m]
@@ -30,6 +30,8 @@ dThicc = 0.0015; % Damaged ring thickness [m]
 degStiffPerc = 0.01; % Stiffness degraded percent
 failure = false; % No initial failures
 Fmode = 'none'; % No initial failure mode
+burstSpeed = [];
+matrixFailureLoc = [];
 
 % Time
 simTime = 1;
@@ -165,7 +167,7 @@ while ~strcmp('Burst',Fmode)
   % -----------------------------------------------------------------------------
   %  Current time and velocity
   %  ---------------------------------------------------------------------------
-    cRPM = iRPM + 1*iter;
+    cRPM = iRPM + 10*iter;
     w = (pi/30) * cRPM;
 
     %% -------------------------------------------------------------------------
@@ -197,7 +199,7 @@ while ~strcmp('Burst',Fmode)
 
     end
 
-    %% -----------------------------------------------------------------------------
+  %% -----------------------------------------------------------------------------
   %  Displacement of rim surfaces
   %  -----------------------------------------------------------------------------
   % Calculate displacement magnitude at the inner and outer surface of each rim
@@ -206,9 +208,8 @@ while ~strcmp('Burst',Fmode)
   % verification purposes, but are not necessary for the program. Check function
   % discription for mor info
     [~, ~, ~, ~] = boundaryConditions(sigb, delta);
-
     fprintf('Calculate Boundary Conditions: Complete\n')
-    %% -----------------------------------------------------------------------------
+  %% -----------------------------------------------------------------------------
   %  Rotor stress strain calculations
   %  -----------------------------------------------------------------------------
   % Calculate discrete displacement, stain, and stress for each rim ~ here is
@@ -216,16 +217,14 @@ while ~strcmp('Burst',Fmode)
   % verification purposes but not necessary for the function. Check function
   % description for mor info
     [~] = discretizeStressStrain(delta);
-
     fprintf('Descretize Stress/Strain: Complete\n')
-    %% -----------------------------------------------------------------------------
+  %% -----------------------------------------------------------------------------
   %  Failure behavior and locations
   %  -----------------------------------------------------------------------------
   % Failure index and type calculations. Calcuates the failure index using the
   % selected faliure modes, determines the type of failure (cracking or burst),
   % and identifies the failure location. Outputs determine if the simulation
-  % should continue or end.
-
+  % should continue or end.    
     if ~strcmp(Ftype, 'none')
       [failure, ~, Fmode, Floc] = failureIndex(Ftype);
       fprintf('Failure Analysis: Complete\n');
@@ -235,17 +234,18 @@ while ~strcmp('Burst',Fmode)
     end
 
     iter = iter + 1;
-
-    results.rotor{1,1} = rotor;
-    results.rArr{1,1} = rArr;
-    results.uArr{1,1} = uArr;
-    results.sArr{1,1} = sArr;
+    results.rotor{iter} = rotor;
+    results.rArr{iter} = rArr;
+    results.uArr{iter} = uArr;
+    results.sArr{iter} = sArr;
   end
 
   if ~strcmp('Burst',Fmode)
-    [delta] = degradeRotor(rim, Floc, dThicc, degStiffPerc, mat, delta);
+    [delta] = degradeRotor(rim, Floc, dThicc, delta);
   end
-
+  
+  burstSpeed(end+1) = cRPM;
+  matrixFailureLoc(end+1) = Floc;
   failure = 0;
   numRims = length(rotor.radii);
 end
