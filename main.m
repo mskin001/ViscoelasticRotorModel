@@ -1,7 +1,7 @@
 clc
 clear
 close('all','force')
-
+warning('off','all')
 %% -----------------------------------------------------------------------------
 %  Declare global variables
 %  -----------------------------------------------------------------------------
@@ -20,14 +20,14 @@ st = 'pe';
 Ftype = 'TsaiWu'; % Options: TsaiWu, MaxR
 
 % Rotor
-rim = [0.0000001, .055, 0.080]; % rim radii in [m]
-rdiv = 30; % Number of points per rim to analyze
+rim = [0.001, .055, 0.080]; % rim radii in [m]
+rdiv = 60; % Number of points per rim to analyze
 delta = [0.175, 0]/1000; % [mm]
-sigb = [0, 0];
+sigb = [-67.5e6, 0];
 mats = {'Al7075T651_Corbin2005.mat','G30-500_8604_Corbin2005.mat'};
 compFunc = @IM7_8552_Tzeng2001; % Compliance function, input 'no' to turn off creep modeling
 dThicc = 0.0015; % Damaged ring thickness [m]
-degStiffPerc = 0.01; % Stiffness degraded percent
+degStiffPerc = 0.005; % Stiffness degraded percent
 failure = false; % No initial failures
 Fmode = 'none'; % No initial failure mode
 burstSpeed = [];
@@ -208,7 +208,7 @@ while ~strcmp('Burst',Fmode)
   % verification purposes, but are not necessary for the program. Check function
   % discription for mor info
     [~, ~, ~, ~] = boundaryConditions(sigb, delta);
-    fprintf('Calculate Boundary Conditions: Complete\n')
+%     fprintf('Calculate Boundary Conditions: Complete\n')
   %% -----------------------------------------------------------------------------
   %  Rotor stress strain calculations
   %  -----------------------------------------------------------------------------
@@ -217,7 +217,7 @@ while ~strcmp('Burst',Fmode)
   % verification purposes but not necessary for the function. Check function
   % description for mor info
     [~] = discretizeStressStrain(delta);
-    fprintf('Descretize Stress/Strain: Complete\n')
+%     fprintf('Descretize Stress/Strain: Complete\n')
   %% -----------------------------------------------------------------------------
   %  Failure behavior and locations
   %  -----------------------------------------------------------------------------
@@ -226,11 +226,12 @@ while ~strcmp('Burst',Fmode)
   % and identifies the failure location. Outputs determine if the simulation
   % should continue or end.    
     if ~strcmp(Ftype, 'none')
-      [failure, ~, Fmode, Floc] = failureIndex(Ftype);
-      fprintf('Failure Analysis: Complete\n');
+      [failure, strengthRatio, Fmode, Floc] = failureIndex(Ftype);
+%       fprintf('Failure Analysis: Complete\n');
     else
       failure = 1; % When not evaluating failure, set to 1 to iterate exactly once.
       Fmode = 'Burst';
+      Floc = 0;
     end
 
     iter = iter + 1;
@@ -241,7 +242,7 @@ while ~strcmp('Burst',Fmode)
   end
 
   if ~strcmp('Burst',Fmode)
-    [delta] = degradeRotor(rim, Floc, dThicc, delta);
+    [delta] = degradeRotor(Floc, dThicc, delta);
   end
   
   burstSpeed(end+1) = cRPM;
