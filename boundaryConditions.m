@@ -1,4 +1,4 @@
-function [Fw, Fd, Fb, K] = boundaryConditions(sigb, delta)
+function [Fw, Fd, Fb, K] = boundaryConditions(sigb)
 % This funciton calculates the displacement at the inner and outer surface of
 % each rim. These will be used as boundary conditions to calculate the stress
 % displacement throughout the entire rotor. The function is separated into
@@ -20,7 +20,7 @@ function [Fw, Fd, Fb, K] = boundaryConditions(sigb, delta)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global rotor numRims U w arraySize
+global rotor numRims delta U w arraySize
 
 K = zeros(arraySize,arraySize);    % global stiffness matrix
 Fw = zeros(arraySize,1);           % vector of centrifugal forces

@@ -6,10 +6,12 @@ warning('off','all')
 %  Declare global variables
 %  -----------------------------------------------------------------------------
 % Global variables and arrays
-global U w numRims arraySize rArr uArr sArr eArr rdiv
+global U w numRims rdiv delta arraySize rArr uArr sArr eArr
 % Global structures
-global plotWhat rotor
-
+global plotWhat rotor failure
+failure = struct();
+rotor = struct();
+plotWhat = struct();
 %% -----------------------------------------------------------------------------
 %  Define initial conditions and rotor size
 %  -----------------------------------------------------------------------------
@@ -17,7 +19,7 @@ global plotWhat rotor
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
 st = 'pe';
-Ftype = 'TsaiWu'; % Options: TsaiWu, MaxR
+failure.crit = 'TsaiWu'; % Options: TsaiWu, MaxR
 
 % Rotor
 rim = [0.001, .055, 0.080]; % rim radii in [m]
@@ -28,8 +30,8 @@ mats = {'Al7075T651_Corbin2005.mat','G30-500_8604_Corbin2005.mat'};
 compFunc = @IM7_8552_Tzeng2001; % Compliance function, input 'no' to turn off creep modeling
 dThicc = 0.0015; % Damaged ring thickness [m]
 degStiffPerc = 0.005; % Stiffness degraded percent
-failure = false; % No initial failures
-Fmode = 'none'; % No initial failure mode
+failure.occured = false; % No initial failures
+failure.mode = 'none'; % No initial failure mode
 burstSpeed = [];
 matrixFailureLoc = [];
 
@@ -67,7 +69,7 @@ plotWhat.delay = 0;              % Time delay in seconds between frames in the g
 %  Start Program
 %  -----------------------------------------------------------------------------
 fprintf('Material behavior: %s\n',st)
-fprintf('Failure model: %s\n', Ftype)
+fprintf('Failure model: %s\n', failure.crit)
 fprintf('Simulation time: %1.0f %s\n',simTime,timeUnit)
 fprintf('Number of rims: %1.0f\n',length(rim)-1)
 fprintf('Material selections: %s\n', mats{1})
@@ -140,7 +142,7 @@ fprintf('Check Input Variables: Complete\n')
 %  Preallocate variables
 %  -----------------------------------------------------------------------------
 numRims = length(rim)-1;
-rotor = struct();
+
 rotor.matInd = linspace(1, numRims, numRims);
 rotor.radii = cell(1, numRims);
 rotor.Q = cell(1, numRims);
@@ -155,7 +157,7 @@ for k = 1:numRims
 end
 
 iter = 0; % 0 corresponds to the initial starting time and velocity. This might change to vari when incorporating VE behavior
-while ~strcmp('Burst',Fmode)
+while ~strcmp('Burst',failure.mode)
   arraySize = numRims+1; % Intermediate variable
   U = zeros(1,arraySize);
   rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
@@ -163,7 +165,7 @@ while ~strcmp('Burst',Fmode)
   sArr = zeros(4,(arraySize-1)*rdiv);    % stress vector
   eArr = zeros(4, rdiv);    % strain vector in each direction
 
-  while ~failure
+  while ~failure.occured
   % -----------------------------------------------------------------------------
   %  Current time and velocity
   %  ---------------------------------------------------------------------------
@@ -181,7 +183,7 @@ while ~strcmp('Burst',Fmode)
       if rotor.intact(k)
         rotor.Q{k} = stiffMat(matProp.mstiff, compFunc);
       else
-        % Do something for broken rims
+        % Reduce the radial elastic modulus for degraded rims
         matProp.mstiff(2) = degStiffPerc * matProp.mstiff(2);
         rotor.Q{k} = stiffMat(matProp.mstiff, 'no');
       end
@@ -207,8 +209,8 @@ while ~strcmp('Burst',Fmode)
   % output of force vector results. These can be important for debugging and
   % verification purposes, but are not necessary for the program. Check function
   % discription for mor info
-    [~, ~, ~, ~] = boundaryConditions(sigb, delta);
-%     fprintf('Calculate Boundary Conditions: Complete\n')
+    [~, ~, ~, ~] = boundaryConditions(sigb);
+
   %% -----------------------------------------------------------------------------
   %  Rotor stress strain calculations
   %  -----------------------------------------------------------------------------
@@ -216,22 +218,22 @@ while ~strcmp('Burst',Fmode)
   % used to the [C] matrix output. This is useful for debugging and
   % verification purposes but not necessary for the function. Check function
   % description for mor info
-    [~] = discretizeStressStrain(delta);
-%     fprintf('Descretize Stress/Strain: Complete\n')
+    [~] = discretizeStressStrain();
+
   %% -----------------------------------------------------------------------------
   %  Failure behavior and locations
   %  -----------------------------------------------------------------------------
   % Failure index and type calculations. Calcuates the failure index using the
   % selected faliure modes, determines the type of failure (cracking or burst),
   % and identifies the failure location. Outputs determine if the simulation
-  % should continue or end.    
-    if ~strcmp(Ftype, 'none')
-      [failure, strengthRatio, Fmode, Floc] = failureIndex(Ftype);
-%       fprintf('Failure Analysis: Complete\n');
+  % should continue or end.
+    if ~strcmp(failure.crit, 'none')
+      [~] = failureIndex();
     else
-      failure = 1; % When not evaluating failure, set to 1 to iterate exactly once.
-      Fmode = 'Burst';
-      Floc = 0;
+      % When not evaluating failure, set to 1 to iterate exactly once.
+      failure.occured = true;
+      failure.mode = 'Burst';
+      failure.loc = 0;
     end
 
     iter = iter + 1;
@@ -241,13 +243,13 @@ while ~strcmp('Burst',Fmode)
     results.sArr{iter} = sArr;
   end
 
-  if ~strcmp('Burst',Fmode)
-    [delta] = degradeRotor(Floc, dThicc, delta);
+  if ~strcmp('Burst',failure.mode)
+    [~] = degradeRotor(dThicc);
   end
-  
+
   burstSpeed(end+1) = cRPM;
-  matrixFailureLoc(end+1) = Floc;
-  failure = 0;
+  matrixFailureLoc(end+1) = failure.loc;
+  failure.occured = false;
   numRims = length(rotor.radii);
 end
 

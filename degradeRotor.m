@@ -1,4 +1,4 @@
-function [delta] = degradeRotor(Floc, dThicc, delta)
+function [outerRadii] = degradeRotor(dThicc)
 % This function takes in the failure location and adds in a ring of degraded
 % material with a thickness of dThicc and degraded material properties
 % degMatProp. This is accomplished by identifying the rim where the failure
@@ -6,20 +6,14 @@ function [delta] = degradeRotor(Floc, dThicc, delta)
 % material with inner radius degInner and outer radius degOuter, and adding
 % those radii to the overall rotor dimensions (rim).
 
-global rotor
-fpos = [];
-k = 1;
-while isempty(fpos)
-  fpos = find((rotor.radii{k}(1) < Floc) && (Floc < rotor.radii{k}(2)),1); % index location of for the outer radius of the failed rim
-  k = k + 1;
-end
+global rotor failure delta
 
-innerPos = k - 1; % position of the failed rim in the rotor
+innerPos = failure.rim; % position of the failed rim in the rotor
 ringPos = innerPos + 1;
 outerPos = innerPos + 2;
 
-ringInner = Floc - dThicc/2; % Inner radius of degraded ring
-ringOuter = Floc + dThicc/2; % Outer radius of degraded ring
+ringInner = failure.loc - dThicc/2; % Inner radius of degraded ring
+ringOuter = failure.loc + dThicc/2; % Outer radius of degraded ring
 
 % Dimension and position of each new rim made from segmenting the origional
 innerRadii = [rotor.radii{innerPos}(1), ringInner];
