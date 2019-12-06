@@ -19,17 +19,14 @@ global mat plotWhat
 st = 've';
 
 % Rotor
-rim = [0.05; 0.1]; % single rim Ha 1999
+rim = [0.110; 0.170]; % single rim Ha 1999
 % rim = [0.03789, 0.079];
 % rim = [0.05, 0.0838, 0.1256, 0.1698];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-<<<<<<< Updated upstream
-sigb = [-.778e8, 0];
-=======
-sigb = [0, 0];
->>>>>>> Stashed changes
+sigb = [-10e6, 0];
+% sigb = [0, 0];
 % mats = {'Glass_Epoxy_Ha1999.mat','T300_2500_Ha2001.mat','T800H_2500_Ha2001.mat'};
 mats = {'IM7_8552_Tzeng2001.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
@@ -41,7 +38,7 @@ numberOfSteps = 3;
 compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 60000;
+rpm = 50000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
@@ -50,7 +47,7 @@ plotWhat.custom1 = 'no';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'yes';
+plotWhat.radDis = 'no';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
@@ -60,7 +57,7 @@ plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
 plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
 
-plotWhat.axialStr = 'yes';
+plotWhat.axialStr = 'no';
 
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
@@ -156,11 +153,8 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-<<<<<<< Updated upstream
-  tArr = [1, 8.76e3, 8.76e4]; % Assumes 1 sec time intervals
-=======
-  tArr = [1, 8760, 87600]; % Assumes 1 sec time intervals
->>>>>>> Stashed changes
+  
+  tArr = [1, 8.76e3*3600, 8.76e4*3600]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')

@@ -141,15 +141,12 @@ if strcmp(plotWhat.radDis, 'yes')
 %   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
 %   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
 %   
-<<<<<<< Updated upstream
   plot(rArr,uArr(1,:),'b-o')
   plot(rArr,uArr(2,:),'g-o')
   plot(rArr,uArr(end,:),'r-o')  
-=======
 %   plot(rArr*39.3701,uArr(1,:)*39.3701,'b-o')
 %   plot(rArr*39.3701,uArr(2,:)*39.3701,'g-o')
 %   plot(rArr*39.3701,uArr(end,:)*39.3701,'r-o')  
->>>>>>> Stashed changes
   
   plot(rArr,uArr(1,:)*1e-6,'b-o')
   plot(rArr,uArr(2,:)*1e-6,'r-s')
