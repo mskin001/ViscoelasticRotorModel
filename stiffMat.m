@@ -10,7 +10,7 @@ nu12 = mstiff(5);
 nu23 = 0.36; % E22/(2*G23)-1;
 
 if ~strcmp(compFunc,'no')
-  out = compFunc(mstiff);
+  out = compFunc();
   if length(out) == 1
     S11 = 1/E11;
     S22 = out;
@@ -22,10 +22,10 @@ if ~strcmp(compFunc,'no')
     S33 = S22;
     G12 = out(2); % This was specified for IM&_8552_Tzeng2001
   elseif length(out) == 3
-    S11 = out(3);
-    S22 = out(1);
+    S11 = out(1);
+    S22 = out(2);
     S33 = out(2);
-    G12 = 1/G12;
+    G12 = out(3);
   else
     error('Unknown compliance function output. Change output, or modify program')
   end
@@ -33,6 +33,7 @@ else
   S11 = 1/E11;
   S22 = 1/E22;
   S33 = S22;
+  nu12 = 0.111;
   nu23 = nu12;
   G12 = 1/G12;
 end
