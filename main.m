@@ -16,7 +16,7 @@ global mat plotWhat
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
   % qdve = quasi-dynamic viscoelasticu
-st = 'pe';
+st = 've';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
@@ -26,14 +26,14 @@ rim = [.110, 0.17];
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Glass_Epoxy_Ha1999.mat'};
+mats = {'CFRP_BM_Almeida2017.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
 simTime = 10e10;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
-compFunc = @IM7_8552_Tzeng2001; % compliance function, input 'no' to turn off creep modeling
+compFunc = @CFRP_BM_Almeida2017; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
 rpm = 10000;
@@ -150,7 +150,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [3600, 3600*10e5, 3600*10e10]; % Assumes 1 sec time intervals
+  tArr = [1, 8760, 87600]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')
