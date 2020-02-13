@@ -1,6 +1,6 @@
 function Q = stiffMat(mstiff, compFunc)
-%% -----------------------------------------------------------------------------
-% Interpretation of the material stiffness properties vector
+%% -----------------------------------------------------------------------------                                                                        
+% Interpretation of the material stiffness properties vector               
 % ------------------------------------------------------------------------------
 E11 = mstiff(1);
 E22 = mstiff(2);
@@ -11,12 +11,7 @@ nu23 = 0.36; % E22/(2*G23)-1;
 
 if ~strcmp(compFunc,'no')
   s = compFunc(mstiff);
-  S11 = s(1);
-  S22 = s(2);
-  S33 = s(3);
-  G12 = s(4);
-  nu12 = s(5);
-  nu23 = s(6);
+  S11 = 
 %   if length(out) == 1
 %     S11 = 1/E11;
 %     S22 = out;
@@ -44,13 +39,14 @@ if ~strcmp(compFunc,'no')
 end
 
 %% -----------------------------------------------------------------------------
-% Assembling the compliance matrix and inversion to stiffness matrix
-% ------------------------------------------------------------------------------
+% Assembling the compliance matrix and inversion to stiffness matrix       
+% ------------------------------------------------------------------------------ 
 S = [ S11      -nu12*S11 -nu12*S11 0;
      -nu12*S11 S22       -nu23*S33 0;
      -nu12*S11 -nu23*S22 S33       0;
      0         0         0         G12];
-
+ 
 Q = inv(S);
 Q(1:2:3,1:2:3) = Q(1:2:3,1:2:3)-Q(1:2:3,2:2:4)*...
     inv(Q(2:2:4,2:2:4))*Q(2:2:4,1:2:3);
+    

@@ -26,14 +26,14 @@ rim = [.110, 0.17];
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'IM7_8552_Tzeng2001.mat'};
+mats = {'CFRP_BM_Almeida2017.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
 simTime = 10e10;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
-compFunc = @Glass_Epoxy_Marty2019; % compliance function, input 'no' to turn off creep modeling
+compFunc = @CFRP_BM_Almeida2017; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
 rpm = 20000;
@@ -150,7 +150,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [1, 800, 5000]; % Assumes 1 sec time intervals
+  tArr = [1, 8760, 87600]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')
@@ -183,27 +183,27 @@ prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
 setappdata(prog,'Canceling',0);
 
 for b = 1:vari
-  t = tArr(b);  
+  t = tArr(b);
   if getappdata(prog,'Canceling')
     delete(prog)
     return
   end
-  
+
   for k = 1:length(mats)
       mat.file{k} = ['MaterialProperties\', mats{k}];
       matProp = load(mat.file{k});
       mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
       mat.rho{k} = matProp.rho;
-      
+
       try
         mat.stren{k} = matProp.stren;
       catch
         break
       end
   end
-  
+
   perc = (b / vari);
-  waitbar(perc,prog)  
+  waitbar(perc,prog)
 end
 
 delete(prog)
