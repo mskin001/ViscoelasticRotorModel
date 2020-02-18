@@ -8,9 +8,9 @@ num = mstiff(3);
 nuk = mstiff(4);
 
 tao = nuk/Ek;
-expo = -t/tao;
+expo = -t/(tao);
 
-s(1) = 1/Em + (1/Ek)*(1-exp(expo)) + (1/num)*t;
+s(1) = 1/Em + (1/Ek)*(1-exp(expo)) + (1/(num))*t;
 
 Em = mstiff(5);
 Ek = mstiff(6);
