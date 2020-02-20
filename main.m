@@ -36,7 +36,7 @@ numberOfSteps = 3;
 compFunc = @CFRP_BM_Almeida2017; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 10000;
+rpm = 20000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
@@ -183,27 +183,27 @@ prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
 setappdata(prog,'Canceling',0);
 
 for b = 1:vari
-  t = tArr(b);  
+  t = tArr(b);
   if getappdata(prog,'Canceling')
     delete(prog)
     return
   end
-  
+
   for k = 1:length(mats)
       mat.file{k} = ['MaterialProperties\', mats{k}];
       matProp = load(mat.file{k});
       mat.Q{b,k} = stiffMat(matProp.mstiff, compFunc);
       mat.rho{k} = matProp.rho;
-      
+
       try
         mat.stren{k} = matProp.stren;
       catch
         break
       end
   end
-  
+
   perc = (b / vari);
-  waitbar(perc,prog)  
+  waitbar(perc,prog)
 end
 
 delete(prog)
