@@ -36,7 +36,7 @@ numberOfSteps = 3;
 compFunc = @CFRP_BM_Almeida2017; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 20000;
+rpm = 500;
 vdiv = 1; % number of points to analyze between each fixed velocity
 
 % Plotting
@@ -83,7 +83,7 @@ for k = 1:length(mats)
     mp = load(m);
     try
         verified = mp.verified;
-        if ~strcmp(verified, 'True')
+        if ~verified
             warning('The material %s has not been verified\n', mats{k})
         end
     catch
@@ -150,7 +150,7 @@ elseif simTime > 1
   elseif strcmp(timeUnit, 'd')
     simTime = simTime * 24 * 3600; % Convert days to seconds
   end
-  tArr = [1, 8760, 87600]; % Assumes 1 sec time intervals
+  tArr = [1, 10, 100]; % Assumes 1 sec time intervals
   w = (pi/30) * rpm;
   vari = length(tArr);
   addpath('ComplianceFunctions')

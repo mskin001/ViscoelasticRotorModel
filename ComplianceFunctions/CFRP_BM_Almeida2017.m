@@ -4,26 +4,22 @@ global t
 
 Em = mstiff(1);
 Ek = mstiff(2);
-num = mstiff(3);
-nuk = mstiff(4);
+eta_m = mstiff(3);
+eta_k = mstiff(4);
 
-tao = nuk/Ek;
+tao = eta_k/Ek;
 expo = -t/(tao);
 
-s(1) = 1/Em + (1/Ek)*(1-exp(expo)) + (1/(num))*t;
+s(1) = 1/Em + (1/Ek)*(1-exp(expo)) + t/eta_m;
 
 Em = mstiff(5);
 Ek = mstiff(6);
-num = mstiff(7);
-nuk = mstiff(8);
+eta_m = mstiff(7);
+eta_k = mstiff(8);
 
-tao = nuk/Ek;
+tao = eta_k/Ek;
 expo = -t/tao;
 
-s(2) = 1/Em + (1/Ek)*(1-exp(expo)) + (1/num)*t;
-
-nu12 = mstiff(9);
-nu23 = nu12;
-
+s(2) = 1/Em + (1/Ek)*(1-exp(expo)) + t/eta_m;
 s(3:4) = s(2);
 s(5:6) = mstiff(9);

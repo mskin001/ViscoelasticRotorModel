@@ -4,10 +4,10 @@ n = 0.0117;
 e0 = 0;
 fm = e0 + A*t.^n;
 
-Em = 1673.7e6;
-num = 5.47e12;
-Ek = 3719.6e6;
-nuk = 4.36e11;
+Em = 6.75e7;
+num = 3.60e6;
+Ek = 171.76;
+nuk = 170.73;
 sig0 = 2e6;
 
 % sig0 = 1;
@@ -15,17 +15,18 @@ sig0 = 2e6;
 % num = 0.219;
 % Ek = 0.001;
 % nuk = -0.276;
-% t = [0,100,200,400,600,800,1000,1200,1400,1600,1800];
+% t = [0,10,20,40,60,80,100,200,300];
 
-tao = nuk/Ek;
-expo = -t/tao;
+tau = nuk/Ek;
+expo = -t/tau;
 
-bm = sig0/Em + (sig0/Ek)*(1-exp(expo)) + (sig0/num).*t;
-
+bm = sig0*(1/Em + (1/Ek)*(1-exp(expo)) + t/num);
 figure(1)
 plot(t, bm);
-figure(2);
-plot(t,fm);
+% hold on
+% plot(t,fm,'r-o')
+% figure(2);
+% plot(t,fm);
 
 % t0 = 0;
 %
