@@ -35,12 +35,12 @@ if ~strcmp(compFunc,'no')
 %   else
 %     error('Unknown compliance function output. Change output, or modify program')
 %   end
-% else
-%   S11 = 1/E11;
-%   S22 = 1/E22;
-%   S33 = S22;
-%   nu23 = nu12;
-%   G12 = 1/G12;
+else
+  S11 = 1/E11;
+  S22 = 1/E22;
+  S33 = S22;
+  nu23 = nu12;
+  G12 = 1/G12;
 end
 
 %% -----------------------------------------------------------------------------

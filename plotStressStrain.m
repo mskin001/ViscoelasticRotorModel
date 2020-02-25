@@ -146,7 +146,7 @@ if strcmp(plotWhat.radDis, 'yes')
 %   plot(rArr*39.3701,uArr(end,:)*39.3701,'r-o')  
   
   xlabel('Radius [mm]')
-  ylabel('Radial Displacement [mm]')
+  ylabel('Radial Displacement [m]')
 %   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
