@@ -23,26 +23,23 @@ expo = -t/tau;
 fiber = sig0*(1/Em + (1/Ek)*(1-exp(expo)) + t/num);
 
 % sig0 = 1;
-Em = 6.75e13;
-num = 3.60e12;
-Ek = 171.76e6;
-nuk = 170.73e6;
+Em = 6.75;
+num = 1.67e13;
+Ek = 17.76e9;
+nuk = 1.32e12;
+t = [0,10,20,40,60,80,100,200,300];
 
 tau = nuk/Ek;
 expo = -t/tau;
 
-trans = sig0*(1/Em + (1/Ek)*(1-exp(expo)) + t/num);
+fiber = sig0*(1/Em + (1/Ek)*(1-exp(expo)) + t/num);
 
 time = log10(t);
-
-figure(1);
-hold on
-plot(time,trans*10^9,'b-', 'LineWidth', 1.5)
-plot(time,fiber*10^9, 'r--', 'LineWidth',1.5)
+figure(1)
+plot(time,fiber*10^9, 'LineWidth',1.5);
 xlabel('Log(t) [s]')
 ylabel('Compliance [1/GPa]')
 set(gca, 'FontSize',12)
-legend('Transverse - [90]_{12}', 'Fiber - [0]_{12}', 'Location', 'northwest')
 
 % figure(2)
 % plot(t,bm)

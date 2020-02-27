@@ -1,4 +1,4 @@
-function [s] = CFRP_BM_Almeida2017(mstiff)
+function [s] = Almeida2018(mstiff)
 
 global t
 

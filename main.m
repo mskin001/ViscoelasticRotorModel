@@ -26,15 +26,15 @@ rim = [.05, 0.06, 0.1];
 rdiv = 30; % number of points per rim to analyze
 delta = [1 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_Ha2006' 'CFRP_BM_Almeida2017.mat'};
+mats = {'Al7075-T6_Ha2006' 'Almeida2018.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
-tArr = [1, 8760, 87600];
+tArr = [1, 8760/2, 8760];
 simTime = 10e10;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
-compFunc = {'no' @CFRP_BM_Almeida2017}; % compliance function, input 'no' to turn off creep modeling
+compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
 rpm = 5000;
@@ -46,7 +46,7 @@ plotWhat.custom1 = 'no';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'yes';
+plotWhat.radDis = 'no';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
@@ -135,32 +135,6 @@ fprintf('Check Input Variables: Complete\n')
 %% -----------------------------------------------------------------------------
 % Create speed/time arrays depending on simulation global
 % ------------------------------------------------------------------------------
-% if length(rpm) > 1
-%   wComp = zeros(vdiv, 1);
-%   for k = 1:length(rpm)-1
-%     w1 = (pi/30) * rpm(k);
-%     w2 = (pi/30) * rpm(k+1);
-%     wStart = (k-1)*vdiv + 1;
-%     wEnd = k*vdiv;
-%     wComp(wStart:wEnd) = linspace(w1, w2, vdiv);
-%   end
-%   w = wComp;
-%   vari = length(wComp);
-% elseif simTime > 1
-%   if strcmp(timeUnit, 'h')
-%     simTime = simTime * 3600; % convert hours to seconds
-%   elseif strcmp(timeUnit, 'd')
-%     simTime = simTime * 24 * 3600; % Convert days to seconds
-%   end
-%   tArr = [1, 8760, 87600]; % Assumes 1 sec time intervals
-%   w = (pi/30) * rpm;
-%   vari = length(tArr);
-%   addpath('ComplianceFunctions')
-% else
-%   w = (pi/30) * rpm;
-%   vari = 1;
-%   tArr = 1;
-% end
 w = (pi/30) * rpm;
 vari = length(tArr);
 addpath('ComplianceFunctions')
