@@ -26,7 +26,7 @@ rim = [.05, 0.06, 0.1];
 rdiv = 30; % number of points per rim to analyze
 delta = [1 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_Ha2006' 'Almeida2018.mat'};
+mats = {'Al7075-T6_Ha2006' 'Almeida_run9.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep

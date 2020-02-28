@@ -39,7 +39,7 @@ figure(1);
 hold on
 plot(time,trans*10^9,'b-', 'LineWidth', 1.5)
 plot(time,fiber*10^9, 'r--', 'LineWidth',1.5)
-xlabel('Log(t) [s]')
+xlabel('Log(t) [hr]')
 ylabel('Compliance [1/GPa]')
 set(gca, 'FontSize',12)
 legend('Transverse - [90]_{12}', 'Fiber - [0]_{12}', 'Location', 'northwest')
