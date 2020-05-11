@@ -35,9 +35,7 @@ elseif length(w) == 1
   for b = 1:vari
     for k = 1:length(rim)-1
       Q11 = mat.Q{b,k}(1,1);
-      Q12 = mat.Q{b,k}(1,2);
       Q13 = mat.Q{b,k}(1,3);
-      Q23 = mat.Q{b,k}(2,3);
       Q33 = mat.Q{b,k}(3,3);
       kappa = sqrt(Q11/Q33); % intermediate variable of stiffness ratio
 

@@ -21,12 +21,12 @@ st = 'pe';
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [.08, 0.2];
+rim = [.08, 0.13 0.2];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = [0]/1000; % [mm]
+delta = [1 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'GFRP_Aparicio2011.mat'};
+mats = {'Al7075-T6_Ha2006' 'Almeida_run9.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
 
@@ -38,9 +38,9 @@ numberOfSteps = 3;
 compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 17.452;
+rpm = 5000;
 vdiv = 1; % number of points to analyze between each fixed velocity
-alpha = 3.6e5; %rad/sec^2
+alpha = 100*pi;
 
 % Plotting
 plotWhat.rims = rim;
