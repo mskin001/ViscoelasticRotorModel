@@ -31,11 +31,13 @@ mats = {'GFRP_Aparicio2011.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
 
 % Time/creep
-tArr = [1, 8760/2, 8760];
-simTime = 10e10;
-timeUnit = 's'; % s = sec, h = hours, d = days
-numberOfSteps = 3;
-compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
+tmax = 100; %seconds?
+tStep = 1; %second between steps
+%tArr = [1, 8760/2, 8760];
+%simTime = 10e10;
+%timeUnit = 's'; % s = sec, h = hours, d = days
+%numberOfSteps = 3;
+%compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
 rpm = 17.452;
@@ -134,10 +136,7 @@ else
 end
 
 fprintf('Check Input Variables: Complete\n')
-%% -----------------------------------------------------------------------------
-% Create speed/time arrays depending on simulation global
-% ------------------------------------------------------------------------------
-w = (pi/30) * rpm;
+
 if strcmp(st,'pe')
     vari = 1;
 else
@@ -145,40 +144,34 @@ else
     addpath('ComplianceFunctions')
 end
 
-fprintf('Create Variable Arrays: Complete\n')
-%% -----------------------------------------------------------------------------
-% Preallocate variables
-% ------------------------------------------------------------------------------
-arraySize = length(rim);
-U = zeros(vari,arraySize);
-rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
-uArr = zeros(vari,(arraySize-1)*rdiv);    % displacement vector for discretization
-sArr = zeros(4,(arraySize-1)*rdiv,vari);    % stress vector
-eArr = zeros(4, rdiv);    % strain vector in each direction
-mat = struct();
-mat.file = cell(length(mats),1);
-mat.Q = cell(vari,length(mats));
+w = (pi/30) * rpm; %initial angular velocity
+b = 1;
+while b*tStep < tmax
+  fprintf('Create Variable Arrays: Complete\n')
+  %% -----------------------------------------------------------------------------
+  % Preallocate variables
+  % ------------------------------------------------------------------------------
+  arraySize = length(rim);
+  U = zeros(vari,arraySize);
+  rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
+  uArr = zeros(vari,(arraySize-1)*rdiv);    % displacement vector for discretization
+  sArr = zeros(4,(arraySize-1)*rdiv,vari);    % stress vector
+  eArr = zeros(4, rdiv);    % strain vector in each direction
 
-fprintf('Preallocate Memory: Complete\n')
-%% -----------------------------------------------------------------------------
-% Create Q matrices for all materials
-% ------------------------------------------------------------------------------
-prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
-  'setappdata(gcbf,''Canceling'',1)');
-setappdata(prog,'Canceling',0);
+  fprintf('Preallocate Memory: Complete\n')
 
-for b = 1:vari
-  t = tArr(b);
-  if getappdata(prog,'Canceling')
-    delete(prog)
-    return
-  end
+  %% -----------------------------------------------------------------------------
+  % Create Q matrices for all materials
+  % ------------------------------------------------------------------------------
+  prog = waitbar(0,'Creating Material Property Matrices', 'CreateCancelBtn',...
+    'setappdata(gcbf,''Canceling'',1)');
+  setappdata(prog,'Canceling',0);
 
   for k = 1:length(mats)
     func = compFunc{k};
     mat.file{k} = ['MaterialProperties\', mats{k}];
     matProp = load(mat.file{k});
-    mat.Q{b,k} = stiffMat(matProp.mstiff, func);
+    mat.Q{1,k} = stiffMat(matProp.mstiff, func);
     mat.rho{k} = matProp.rho;
 
     try
@@ -188,41 +181,42 @@ for b = 1:vari
     end
   end
 
-  perc = (b / vari);
-  waitbar(perc,prog)
+  fprintf('Create Material Property Matrices: Complete\n')
+  %% ----------------------------------------------------------------------------
+  % Calculate displacement magnitude at the inner and outer surface of each rim
+  % these are used as boundary conditions to find C. ~ is used to disregard
+  % output of force vector results. These can be important for debugging and
+  % verification purposes, but are not necessary for the program. Check function
+  % discription for mor info
+  [~, ~, ~, ~] = boundaryConditions(sigb, demhyrlta);
+
+  if vari == -1
+    return
+  end
+  fprintf('Calculate Boundary Conditions: Complete\n')
+  %% -----------------------------------------------------------------------------
+  % Calculate discrete displacement, stain, and stress for each rim ~ here is
+  % used to the [C] matrix output. This is useful for debugging and
+  % verification purposes but not necessary for the function. Check function
+  % description for mor info
+  [~] = discretizeStressStrain(rdiv, delta);
+
+  if vari == -1
+    return
+  end
+  fprintf('Descretize Stress/Strain: Complete\n')
+
+  %%------------------------------------------------------------------------------
+  % Calculate the share stress on the rim.
+  [tau] = shearStress(alpha, rdiv);
+
+  %% -----------------------------------------------------------------------------
+  % Update angular velocity and time
+  % ------------------------------------------------------------------------------
+  w = w + b*tStep * alpha; %initial angular velocity
+  b = b + b;
+
 end
-
-delete(prog)
-fprintf('Create Material Property Matrices: Complete\n')
-%% ----------------------------------------------------------------------------
-% Calculate displacement magnitude at the inner and outer surface of each rim
-% these are used as boundary conditions to find C. ~ is used to disregard
-% output of force vector results. These can be important for debugging and
-% verification purposes, but are not necessary for the program. Check function
-% discription for mor info
-[~, ~, ~, ~] = boundaryConditions(sigb, delta);
-
-if vari == -1
-  return
-end
-fprintf('Calculate Boundary Conditions: Complete\n')
-%% -----------------------------------------------------------------------------
-% Calculate discrete displacement, stain, and stress for each rim ~ here is
-% used to the [C] matrix output. This is useful for debugging and
-% verification purposes but not necessary for the function. Check function
-% description for mor info
-[~] = discretizeStressStrain(rdiv, delta);
-
-if vari == -1
-  return
-end
-fprintf('Descretize Stress/Strain: Complete\n')
-
-%%------------------------------------------------------------------------------
-% Calculate the share stress on the rim. 
-[tau] = shearStress(alpha, rdiv);
-
-
 %% -----------------------------------------------------------------------------
 % Make Plots
 plotStressStrain()

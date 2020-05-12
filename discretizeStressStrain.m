@@ -29,58 +29,54 @@ prog = waitbar(0,'Descretize Stress/Strain', 'CreateCancelBtn',...
   'setappdata(gcbf,''Canceling'',1)');
 setappdata(prog,'Canceling',0);
 
-if length(w) > 1
-  % Under construction
-elseif length(w) == 1
-  for b = 1:vari
-    for k = 1:length(rim)-1
-      Q11 = mat.Q{b,k}(1,1);
-      Q13 = mat.Q{b,k}(1,3);
-      Q33 = mat.Q{b,k}(3,3);
-      kappa = sqrt(Q11/Q33); % intermediate variable of stiffness ratio
+for b = 1:vari
+  for k = 1:length(rim)-1
+    Q11 = mat.Q{b,k}(1,1);
+    Q13 = mat.Q{b,k}(1,3);
+    Q33 = mat.Q{b,k}(3,3);
+    kappa = sqrt(Q11/Q33); % intermediate variable of stiffness ratio
 
-      % intermediate variables for calculating the stiffness matrix
-      fi0 = 1/(Q33 * (9 - kappa^2));
-      fi1 = 1/(Q13 + (kappa * Q33));
-      fi2 = 1/(Q13 - (kappa * Q33));
+    % intermediate variables for calculating the stiffness matrix
+    fi0 = 1/(Q33 * (9 - kappa^2));
+    fi1 = 1/(Q13 + (kappa * Q33));
+    fi2 = 1/(Q13 - (kappa * Q33));
 
-      % Calculate absolute displacement at the inner and outer surface of each rim
-      u = [U(b,k); U(b,k+1) - delta(k)];
-      iota = diag([fi1,fi2]);
-      uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
-      G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
-      C = (G*iota)\(u - uw);
+    % Calculate absolute displacement at the inner and outer surface of each rim
+    u = [U(b,k); U(b,k+1) - delta(k)];
+    iota = diag([fi1,fi2]);
+    uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
+    G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
+    C = (G*iota)\(u - uw);
 
-      % Discretize radius vector
-      rv = linspace(rim(k), rim(k+1), rdiv);
-      rvstart = (k-1)*rdiv + 1;
-      rvend = k*rdiv;
-      rArr(rvstart:rvend) = rv;
+    % Discretize radius vector
+    rv = linspace(rim(k), rim(k+1), rdiv);
+    rvstart = (k-1)*rdiv + 1;
+    rvend = k*rdiv;
+    rArr(rvstart:rvend) = rv;
 
-      % Calculate discrete displacement vector
-      dv = -mat.rho{k}*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
-      uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
+    % Calculate discrete displacement vector
+    dv = -mat.rho{k}*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
+    uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
-      % Strain
-      e1 = dv ./ rv;
-      e3 = -3*mat.rho{k}*w^2*fi0*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
-      e2 = zeros(size(e1)); % no strain in the axial or shear directions
-      e4 = zeros(size(e1));
-      eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]
+    % Strain
+    e1 = dv ./ rv;
+    e3 = -3*mat.rho{k}*w^2*fi0*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
+    e2 = zeros(size(e1)); % no strain in the axial or shear directions
+    e4 = zeros(size(e1));
+    eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]
 
-      % Stress
-      stress = mat.Q{b,k} * eArr;
-      sArr(:,rvstart:rvend,b) = stress;
-    end
-    
-    if getappdata(prog,'Canceling')
-      delete(prog)
-      vari = -1;
-      return
-    end
-    perc = (b / vari);
-    waitbar(perc,prog)
+    % Stress
+    stress = mat.Q{b,k} * eArr;
+    sArr(:,rvstart:rvend,b) = stress;
   end
+
+  if getappdata(prog,'Canceling')
+    delete(prog)
+    vari = -1;
+    return
+  end
+  perc = (b / vari);
+  waitbar(perc,prog)
 end
 
 delete(prog)
