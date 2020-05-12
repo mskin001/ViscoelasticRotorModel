@@ -1,4 +1,4 @@
-function [C_shear] = shearStress(alpha, rdiv)
+function [tau] = shearStress(alpha, rdiv)
 
 global rim mat tauArr
 
@@ -15,7 +15,6 @@ for k = 1:length(rim) - 2
   gRatio = mat.Q{end-k+1}(4,4)/mat.Q{end-k}(4,4);
   C(end-k) = (a(end-k) - gRatio * a(end-k+1)) * rim(k+1)^4/8 + gRatio*C(end-k+1);
 end
-C_shear = C;
 
 for k = 1:length(rim) - 1 
     dr = linspace(rim(k),rim(k+1),rdiv);

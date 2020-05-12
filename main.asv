@@ -21,12 +21,12 @@ st = 'pe';
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [08, 0.2];
+rim = [.08, 0.2];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_ha2006.mat' 'GFRP_Aparicio2011.mat'};
+mats = {'GFRP_Aparicio2011.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
 
@@ -147,7 +147,7 @@ end
 %% -------------------------------------------------------------------------------
 % Program Begin
 % --------------------------------------------------------------------------------
-vel = zeros(1,tmax/tStep);
+vel = zeros(1,tmax,tmax/tStep);
 w = (pi/30) * rpm; %initial angular velocity
 b = 1;
 while b*tStep <= tmax
