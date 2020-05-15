@@ -21,12 +21,12 @@ st = 'pe';
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [08, 0.2];
+rim = [0.08, 0.2];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_ha2006.mat' 'GFRP_Aparicio2011.mat'};
+mats = {'GFRP_Aparicio2011.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
 
@@ -137,6 +137,9 @@ end
 
 fprintf('Check Input Variables: Complete\n')
 
+%% -----------------------------------------------------------------------------
+% Program Begin
+% ------------------------------------------------------------------------------
 if strcmp(st,'pe')
     vari = 1;
 else
@@ -144,17 +147,14 @@ else
     addpath('ComplianceFunctions')
 end
 
-%% -------------------------------------------------------------------------------
-% Program Begin
-% --------------------------------------------------------------------------------
 vel = zeros(1,tmax/tStep);
 w = (pi/30) * rpm; %initial angular velocity
 b = 1;
 while b*tStep <= tmax
   fprintf('Create Variable Arrays: Complete\n')
-  %% -----------------------------------------------------------------------------
+  %% ---------------------------------------------------------------------------
   % Preallocate variables
-  % ------------------------------------------------------------------------------
+  % ----------------------------------------------------------------------------
   arraySize = length(rim);
   U = zeros(vari,arraySize);
   rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
@@ -165,9 +165,9 @@ while b*tStep <= tmax
 
   fprintf('Preallocate Memory: Complete\n')
 
-  %% -----------------------------------------------------------------------------
+  %% ---------------------------------------------------------------------------
   % Create Q matrices for all materials
-  % ------------------------------------------------------------------------------
+  % ----------------------------------------------------------------------------
 
   for k = 1:length(mats)
     func = compFunc{k};
@@ -184,7 +184,7 @@ while b*tStep <= tmax
   end
 
   fprintf('Create Material Property Matrices: Complete\n')
-  %% ----------------------------------------------------------------------------
+  %% ---------------------------------------------------------------------------
   % Calculate displacement magnitude at the inner and outer surface of each rim
   % these are used as boundary conditions to find C. ~ is used to disregard
   % output of force vector results. These can be important for debugging and
@@ -196,7 +196,7 @@ while b*tStep <= tmax
     return
   end
   fprintf('Calculate Boundary Conditions: Complete\n')
-  %% -----------------------------------------------------------------------------
+  %% ---------------------------------------------------------------------------
   % Calculate discrete displacement, stain, and stress for each rim ~ here is
   % used to the [C] matrix output. This is useful for debugging and
   % verification purposes but not necessary for the function. Check function
@@ -208,32 +208,38 @@ while b*tStep <= tmax
   end
   fprintf('Descretize Stress/Strain: Complete\n')
 
-  %%------------------------------------------------------------------------------
+  %%----------------------------------------------------------------------------
   % Calculate the share stress on the rim.
   [~] = shearStress(alpha, rdiv);
 
-  %% -----------------------------------------------------------------------------
+  %% ---------------------------------------------------------------------------
   % Store results for post processing
-  % ------------------------------------------------------------------------------
+  % ----------------------------------------------------------------------------
   results.rArr{b} = rArr;
   results.uArr{b} = uArr;
   results.sArr{b} = sArr;
   results.tauArr{b} = tauArr;
-  
+
   fprintf('Current time: %7.3f\n', b*tStep)
   fprintf('Iteration %2.0f Complete\n\n', b)
-  
-  %% -----------------------------------------------------------------------------
+
+  %% ---------------------------------------------------------------------------
   % Update angular velocity and time
-  % ------------------------------------------------------------------------------
+  % ----------------------------------------------------------------------------
   vel(b) = w;
   w = w + b*tStep * alpha; %initial angular velocity
   b = b + 1;
-  
-  
+
+
 end
+
+%% -----------------------------------------------------------------------------
+% Calculate failure criterion
+% ------------------------------------------------------------------------------
+[F] = failureIndex(results,rdiv);
 %% -----------------------------------------------------------------------------
 % Make Plots
+% ------------------------------------------------------------------------------
 plotStressStrain()
 
 fprintf('Create Output Plots: Complete\n\n')
