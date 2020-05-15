@@ -20,15 +20,15 @@ st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-rim = [0.03789, 0.07901];
+rim = [.055, 0.08];
 % rim = [0.08, 0.2];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-0.78e8, 0];
+sigb = [-67.5e6, 0];
 % mats = {'GFRP_Aparicio2011.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
-mats = {'Glass_Epoxy_Ha1999.mat'};
+mats = {'G30-500_8604_Corbin2005.mat'};
 
 % Time/creep
 tmax = 0.005; %seconds?
@@ -40,7 +40,7 @@ numberOfSteps = 3;
 compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 60000;
+rpm = 65000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 alpha = 0; %rad/sec^2
 
