@@ -20,7 +20,7 @@ function [Fw, Fd, Fb, K] = boundaryConditions(sigb, delta)
 %% -----------------------------------------------------------------------------
 % Preallocate variables
 %-------------------------------------------------------------------------------
-global U rim w mat arraySize vari
+global U rim w mat arraySize
 
 K = zeros(arraySize,arraySize);    % global stiffness matrix
 Fw = zeros(arraySize,1);           % vector of centrifugal forces
@@ -29,61 +29,39 @@ Fb = zeros(arraySize,1);           % vector of boundary condition forces
 %% -----------------------------------------------------------------------------
 % Calculate boundary displacement at the inner and outer surface of each rim
 % ------------------------------------------------------------------------------
-prog = waitbar(0,'Calculating Boundary Conditions', 'CreateCancelBtn',...
-  'setappdata(gcbf,''Canceling'',1)');
-setappdata(prog,'Canceling',0);
 
-for b = 1:vari
-  for k = 1:length(rim)-1
-    Q11 = mat.Q{b,k}(1,1);
-    Q13 = mat.Q{b,k}(1,3);
-    Q33 = mat.Q{b,k}(3,3);
-    kappa = sqrt(Q11/Q33);
+for k = 1:length(rim)-1
+  Q11 = mat.Q{b,k}(1,1);
+  Q13 = mat.Q{b,k}(1,3);
+  Q33 = mat.Q{b,k}(3,3);
+  kappa = sqrt(Q11/Q33);
 
-    % intermediate variables for calculating the stiffness matrix
-    fi0 = 1/(Q33 * (9 - kappa^2));
-    fi3 = (3 * Q33 + Q13) / (Q33 * (9 - kappa^2));
+  % intermediate variables for calculating the stiffness matrix
+  fi0 = 1/(Q33 * (9 - kappa^2));
+  fi3 = (3 * Q33 + Q13) / (Q33 * (9 - kappa^2));
 
-    z = rim(k)/rim(k+1);
-    z1 = z^-kappa + z^kappa;
-    z2 = z^-kappa - z^kappa;
+  z = rim(k)/rim(k+1);
+  z1 = z^-kappa + z^kappa;
+  z2 = z^-kappa - z^kappa;
 
-    % Local stiffness matrix
-    kMat = (1/z2) * [kappa*z1*Q33-z2*Q13, -2*kappa*Q33;
-                    -2*kappa*Q33, kappa*z1*Q33+z2*Q13];
+  % Local stiffness matrix
+  kMat = (1/z2) * [kappa*z1*Q33-z2*Q13, -2*kappa*Q33;
+                  -2*kappa*Q33, kappa*z1*Q33+z2*Q13];
 
-    % Global stiffness matrix for the entire
-    K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
+  % Global stiffness matrix for the entire
+  K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
 
-    fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
-    uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
+  fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
+  uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
 
-    fw = -fsig + kMat*uw;
-    Fw(k:k+1) = Fw(k:k+1) + fw;
+  fw = -fsig + kMat*uw;
+  Fw(k:k+1) = Fw(k:k+1) + fw;
 
-    Fd(k:k+1) = Fd(k:k+1) + kMat*[0;delta(k)];
-  end
-
-  % Force from external pressure applied to inner and outer surface of the rim
-  Fb(1) = -rim(1)*sigb(1);
-  Fb(end) = rim(end)*sigb(end);
-  % Displacement at the inner and outer radius of each rim
-  U(b,:) = K \ (Fb + Fw + Fd);
-
-  % Reset matrix values
-  K = K .* 0;
-  Fw = Fw .* 0;
-  Fb = Fb .* 0;
-  Fd = Fd .* 0;
-
-  if getappdata(prog,'Canceling')
-    delete(prog)
-    vari = -1;
-    return
-  end
-  perc = (b / vari);
-  waitbar(perc,prog)
+  Fd(k:k+1) = Fd(k:k+1) + kMat*[0;delta(k)];
 end
 
-delete(prog)
-end
+% Force from external pressure applied to inner and outer surface of the rim
+Fb(1) = -rim(1)*sigb(1);
+Fb(end) = rim(end)*sigb(end);
+% Displacement at the inner and outer radius of each rim
+U(b,:) = K \ (Fb + Fw + Fd);

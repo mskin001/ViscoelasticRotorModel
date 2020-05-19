@@ -7,7 +7,7 @@ close('all','force')
 % Global variables and arrays
 global U w rim arraySize rArr uArr sArr eArr tauArr vari
 % Global structures
-global mat plotWhat
+global mat plotWhat results
 
 %% -----------------------------------------------------------------------------
 % Define initial conditions and rotor size
@@ -45,20 +45,17 @@ vdiv = 1; % number of points to analyze between each fixed velocity
 alpha = 0; %rad/sec^2
 
 % Plotting
-plotWhat.rims = rim;
 plotWhat.custom1 = 'no';
+plotWhat.radDis = 'no';
+plotWhat.radStr = 'yes';         % Radial stress v. radius plot
+plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'no';
-
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
-plotWhat.radStr = 'yes';         % Radial stress v. radius plot
-
-plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
@@ -140,25 +137,20 @@ fprintf('Check Input Variables: Complete\n')
 %% -----------------------------------------------------------------------------
 % Program Begin
 % ------------------------------------------------------------------------------
-if strcmp(st,'pe')
-    vari = 1;
-else
-    vari = length(tArr);
-    addpath('ComplianceFunctions')
-end
-
 vel = zeros(1,tmax/tStep);
 w = (pi/30) * rpm; %initial angular velocity
+vari = tmax/tSteps;
 b = 1;
+
 while b*tStep <= tmax
   fprintf('Create Variable Arrays: Complete\n')
   %% ---------------------------------------------------------------------------
   % Preallocate variables
   % ----------------------------------------------------------------------------
   arraySize = length(rim);
-  U = zeros(vari,arraySize);
+  U = zeros(1,arraySize);
   rArr = zeros(1,(arraySize-1)*rdiv);    % radius vector for descretization
-  uArr = zeros(vari,(arraySize-1)*rdiv);    % displacement vector for discretization
+  uArr = zeros(1,(arraySize-1)*rdiv);    % displacement vector for discretization
   sArr = zeros(4,(arraySize-1)*rdiv,vari);    % stress vector
   tauArr = zeros(1,(arraySize-1)*rdiv);
   eArr = zeros(4, rdiv);    % strain vector in each direction
@@ -192,9 +184,6 @@ while b*tStep <= tmax
   % discription for mor info
   [~, ~, ~, ~] = boundaryConditions(sigb, delta);
 
-  if vari == -1
-    return
-  end
   fprintf('Calculate Boundary Conditions: Complete\n')
   %% ---------------------------------------------------------------------------
   % Calculate discrete displacement, stain, and stress for each rim ~ here is
@@ -203,9 +192,6 @@ while b*tStep <= tmax
   % description for mor info
   [~] = discretizeStressStrain(rdiv, delta);
 
-  if vari == -1
-    return
-  end
   fprintf('Descretize Stress/Strain: Complete\n')
 
   %%----------------------------------------------------------------------------
@@ -220,7 +206,7 @@ while b*tStep <= tmax
   results.sArr{b} = sArr;
   results.tauArr{b} = tauArr;
 
-  fprintf('Current time: %7.3f\n', b*tStep)
+  fprintf('Current time: %5.2f\n', b*tStep)
   fprintf('Iteration %2.0f Complete\n\n', b)
 
   %% ---------------------------------------------------------------------------
