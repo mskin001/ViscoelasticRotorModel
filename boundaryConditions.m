@@ -29,7 +29,7 @@ Fb = zeros(arraySize,1);           % vector of boundary condition forces
 %% -----------------------------------------------------------------------------
 % Calculate boundary displacement at the inner and outer surface of each rim
 % ------------------------------------------------------------------------------
-
+b = 1; % b variable leftover from viscoelastic stuff. Left in for potential future work.
 for k = 1:length(rim)-1
   Q11 = mat.Q{b,k}(1,1);
   Q13 = mat.Q{b,k}(1,3);

@@ -2,9 +2,8 @@ function plotStressStrain()
 %% -----------------------------------------------------------------------------
 % Define global variables, arrays, and structures
 % ------------------------------------------------------------------------------
-global rim plotWhat results mat
+global rim rArr plotWhat results mat
 
-rArr = results.rArr;
 uArr = results.uArr;
 sArr = results.sArr;
 tau =  results.tauArr;
@@ -21,6 +20,7 @@ or = rim;
 % ------------------------------------------------------------------------------
 % To create additional custom plots copy and paste this section to create
 % as many custom plots as desired.
+halfWay = round(length(sArr)/2);
 
 if strcmp(plotWhat.custom1, 'yes')
   nr = rArr ./ min(rArr);
@@ -70,18 +70,22 @@ if strcmp(plotWhat.radDis, 'yes')
 %   TzengInitial = csvread('Tzeng2001RadialDispInitial.csv');
 %   TzengMid = csvread('Tzeng2001RadialDispMid.csv');
 %   TzengInf = csvread('Tzeng2001RadialDispInf.csv');
-
-  hold on
 %   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
 %   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
 %   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-
-  plot(rArr*1000,uArr(1,:),'b-o', 'LineWidth', 1)
-  plot(rArr*1000,uArr(2,:),'r-d', 'LineWidth', 1)
-  plot(rArr*1000,uArr(3,:),'k-s', 'LineWidth', 1)
 %   plot(rArr*39.3701,uArr(2,:)*39.3701,'g-o')
 %   plot(rArr*39.3701,uArr(end,:)*39.3701,'r-o')
+  hold on
+  try
+    subSet = uArr(1:plotWhat.interval:end);
+  catch
+    subSet = uArr;
+  end
 
+  hold on
+  for k = 1:length(subSet)
+    plot(rArr*1000, subSet{k}(1,:)*10^-6, 'LineWidth', 1);
+  end
   xlabel('Radius [mm]')
   ylabel('Radial Displacement [m]')
   legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
@@ -98,17 +102,22 @@ if strcmp(plotWhat.radStr, 'yes')
 %   TzengInitial = csvread('Tzeng2001RadialStrInitial.csv');
 %   TzengMid = csvread('Tzeng2001RadialStrMid.csv');
 %   TzengInf = csvread('Tzeng2001RadialStrInf.csv');
-
-  hold on
 %   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
 %   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
 %   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-  plot(rArr*1000,sArr(3,:,1)*10^-6,'b-o', 'LineWidth', 1)
-  plot(rArr*1000,sArr(3,:,2)*10^-6,'r-d', 'LineWidth', 1)
-  plot(rArr*1000,sArr(3,:,3)*10^-6,'k-s', 'LineWidth', 1)
 %   plot(rArr*39.3701,sArr(3,:,2)*0.000145038,'g-o')
 %   plot(rArr*39.3701,sArr(3,:,end)*0.000145038,'r-o')
+  hold on
+  try
+    subSet = sArr(1:plotWhat.interval:end);
+  catch
+    subSet = sArr;
+  end
 
+  hold on
+  for k = 1:length(subSet)
+    plot(rArr*1000, subSet{k}(3,:,1)*10^-6, 'LineWidth', 1);
+  end
   xlabel('Radius [mm]')
   ylabel('Radial Stress [MPa]')
   legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
@@ -128,11 +137,20 @@ if strcmp(plotWhat.hoopStr, 'yes')
 %   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
 %   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
 %   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-  plot(rArr*1000,sArr(1,:,1)*10^-6,'b-o', 'LineWidth', 1)
-  plot(rArr*1000,sArr(1,:,2)*10^-6,'r-d', 'LineWidth', 1)
-  plot(rArr*1000,sArr(1,:,3)*10^-6,'k-s', 'LineWidth', 1)
 %   plot(rArr*39.3701,sArr(1,:,2)*0.000145038,'g-o')
 %   plot(rArr*39.3701,sArr(1,:,end)*0.000145038,'r-*')
+  try
+    subSet = sArr(1:plotWhat.interval:end);
+  catch
+    subSet = sArr;
+  end
+
+  hold on
+  for k = 1:length(subSet)
+    plot(rArr*1000, subSet{k}(1,:,1)*10^-6, 'LineWidth', 1);
+  end
+
+
   xlabel('Radius [mm]')
   ylabel('Hoop Stress [MPa]')
   legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
@@ -144,10 +162,17 @@ end
 
 % -------------- Shear stress --------------------------------------------------
 if strcmp(plotWhat.shearStr, 'yes')
-  shearStr = figure('Visible', 'on')
+  shearStr = figure('Visible', 'on');
+  try
+    tauSubSet = tau(1:plotWhat.interval:end); % select tau of interest to plot
+  catch
+    % warning('Failed to limit tau to descrete intervals. Plotting all tau.')
+    tauSubSet = tau;
+  end
+
   hold on
-  for k = 1:length(tau)
-    plot(rArr*1000,tau{k}*10^-6, 'LineWidth', 1);
+  for k = 1:length(tauSubSet)
+    plot(rArr*1000,tauSubSet{k}*10^-6, 'LineWidth', 1);
   end
   xlabel('Radius [mm]')
   ylabel('Shear Stress [MPa]')
@@ -157,6 +182,20 @@ end
 
 
 % -------------- Peak stress ---------------------------------------------------
+hold on
+if strcmp(plotWhat.peakStr, 'yes')
+  peakStr = figure('Visible','on')
+  yyaxis left; plot(results.vel,results.peakloc*1000);
+  yyaxis right; plot(results.vel,results.peakstr);
+
+end
+
+xlabel('Angular velocity [rpm]')
+yyaxis left
+ylabel('Peak Stress Location [m]')
+yyaxis right
+ylabel('Strength Ratio')
+
 
 %% -----------------------------------------------------------------------------
 % Make .gifs

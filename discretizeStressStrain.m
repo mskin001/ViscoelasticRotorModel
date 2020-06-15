@@ -25,6 +25,7 @@ global mat rim U w rArr uArr sArr eArr
 %% -----------------------------------------------------------------------------
 % Calculate stress, strain, displacement for each rim
 % ------------------------------------------------------------------------------
+b = 1; % leftover from viscoelastic work. Left in for potential future work.
 for k = 1:length(rim)-1
   Q11 = mat.Q{b,k}(1,1);
   Q13 = mat.Q{b,k}(1,3);

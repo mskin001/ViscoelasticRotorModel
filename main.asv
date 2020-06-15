@@ -40,9 +40,9 @@ numberOfSteps = 3;
 compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 80000;
+rpm = 0000;
 vdiv = 1; % number of points to analyze between each fixed velocity
-alpha = @(t) 100*t; %rad/sec^2 exp: 10*exp(t/0.5), sin: 10*sin(p*t + (3*pi/2)) + 10
+alpha = @(t) 10*t; %rad/sec^2 exp: 10*exp(t/0.5), sin: 10*sin(p*t + (3*pi/2)) + 10
 
 % Plotting
 plotWhat.custom1 = 'no';
@@ -213,7 +213,7 @@ while b*tStep <= tmax
   %% ---------------------------------------------------------------------------
   % Update angular velocity and time
   % ----------------------------------------------------------------------------
-  w = w + alpha(tStep); %initial angular velocity  
+  w = w + acc(tStep); %initial angular velocity  
   b = b + 1;
 
 

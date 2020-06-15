@@ -1,8 +1,8 @@
-function [R] = failureIndex(results,rdiv)
+function [R] = failureIndex(rdiv)
 
-global rim mat vari
+global results rArr rim mat vari
 
-for b = vari
+for b = 1:vari
   for k = 1:length(rim) - 1
     rStart = (k-1)*rdiv + 1;
     rEnd = k*rdiv;
@@ -33,4 +33,10 @@ for b = vari
     strRatio(b,rStart:rEnd) = R(b,rStart:rEnd).^-1;
 
   end
+  [peakStr(b), ind] = max(strRatio(b,:));
+  peakLoc(b) = rArr(ind);
+
 end
+
+results.peakstr = peakStr;
+results.peakloc = peakLoc;
