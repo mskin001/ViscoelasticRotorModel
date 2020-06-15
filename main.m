@@ -21,10 +21,10 @@ st = 've';
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [.05, 0.6, 0.1];
+rim = [.05, 0.06, 0.1];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = [0.4, 0]/1000; % [mm]
+delta = [1, 0]/1000; % [mm]
 sigb = [0, 0];
 mats = {'Al7075-T6_Ha2006','Almeida2018.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
@@ -35,10 +35,10 @@ tArr = [1, 8760/2, 8760];
 simTime = 10e10;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
-compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
+compFunc = {'no' @Almeida2018}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 60000;
+rpm = 5000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 alpha = 0; %rad/sec^2
 
