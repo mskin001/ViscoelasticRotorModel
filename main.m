@@ -16,17 +16,17 @@ global mat plotWhat
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
   % qdve = quasi-dynamic viscoelasticu
-st = 'pe';
+st = 've';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [.08, 0.2];
+rim = [.05, 0.6, 0.1];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = [0]/1000; % [mm]
+delta = [0.4, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'GFRP_Aparicio2011.mat'};
+mats = {'Al7075-T6_Ha2006','Almeida2018.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
 
@@ -38,9 +38,9 @@ numberOfSteps = 3;
 compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 17.452;
+rpm = 60000;
 vdiv = 1; % number of points to analyze between each fixed velocity
-alpha = 3.6e5; %rad/sec^2
+alpha = 0; %rad/sec^2
 
 % Plotting
 plotWhat.rims = rim;
@@ -56,7 +56,7 @@ plotWhat.radStr = 'yes';         % Radial stress v. radius plot
 
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.hoopGifName = 'Hoop Stress.gif';
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
 
 plotWhat.interval = 1;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
