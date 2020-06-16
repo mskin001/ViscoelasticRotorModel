@@ -1,6 +1,6 @@
 clc
 clear
-% close('all','force')
+close('all','force')
 %% -----------------------------------------------------------------------------
 % Define global variables
 % ------------------------------------------------------------------------------
@@ -20,15 +20,15 @@ st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-rim = [.055, 0.08];
+rim = [.05, 0.1];
 % rim = [0.08, 0.2];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-22.5e6, 0];
+sigb = [-30e6, 0];
 % mats = {'GFRP_Aparicio2011.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
-mats = {'GFRP_Aparicio2011.mat'};
+mats = {'CFRP_Aparicio2011.mat'};
 
 % Time/creep
 tmax = 20; %seconds?
@@ -37,19 +37,19 @@ tStep = 0.2; %second between steps
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
 numberOfSteps = 3;
-compFunc = {'no' @Militky15}; % compliance function, input 'no' to turn off creep modeling
+compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 80000;
+rpm = 50000;
 vdiv = 1; % number of points to analyze between each fixed velocity
-alpha = @(t) 100*t; %rad/sec^2 exp: 10*exp(t/0.5), sin: 10*sin(p*t + (3*pi/2)) + 10
+alpha = @(t) 200*t; %rad/sec^2 exp: 10*exp(t/0.5), sin: 10*sin(p*t + (3*pi/2)) + 10
 
 % Plotting
 plotWhat.custom1 = 'no';
 plotWhat.radDis = 'no';
 plotWhat.radStr = 'no';         % Radial stress v. radius plot
 plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
-plotWhat.shearStr = 'yes';
+plotWhat.shearStr = 'no';
 plotWhat.peakStr = 'yes';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
