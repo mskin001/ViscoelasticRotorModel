@@ -182,9 +182,9 @@ end
 
 
 % -------------- Peak stress ---------------------------------------------------
-hold on
 if strcmp(plotWhat.peakStr, 'yes')
-  peakStr = figure('Visible','on')
+  peakStr = figure('Visible','on');
+  hold on
   yyaxis left; plot(results.vel,results.peakloc*1000);
   yyaxis right; plot(results.vel,results.peakstr);
 

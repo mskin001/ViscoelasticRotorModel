@@ -41,9 +41,24 @@ compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep mode
 
 % Speed/velocity
 rpm = 50000;
-vdiv = 1; % number of points to analyze between each fixed velocity
-alpha = @(t) 200*t; %rad/sec^2 exp: 10*exp(t/0.5), sin: 10*sin(p*t + (3*pi/2)) + 10
+rpmMax = 98000;
 
+% Linear Acceleration:
+% alpha = @(t,wIni) wIni + 230*t;
+
+% Exponential growth: (Use this one)
+alpha = @(t,wIni) wIni + 1.089^(5*t);
+
+%-------------------
+% %Exponential behavior:
+% T = tmax / log(rpmMax/rpm);
+% alpha = @(t,wIni) (wIni * exp(t/T));
+
+%------------------
+% Sin behavior:
+% alpha = @(t,wIni) sin: wIni + 2356.2*sin((2*pi/40)*t + (3*pi/2)) + 2356.2
+                            
+vdiv = 1; % number of points to analyze between each fixed velocity
 % Plotting
 plotWhat.custom1 = 'no';
 plotWhat.radDis = 'no';
@@ -141,6 +156,7 @@ fprintf('Check Input Variables: Complete\n')
 % ------------------------------------------------------------------------------
 % vel = zeros(1,tmax/tStep);
 w = (pi/30) * rpm; %initial angular velocity
+w0 = w;
 vari = cast(tmax/tStep,'single');
 b = 1;
 
@@ -198,7 +214,7 @@ while b*tStep <= tmax
 
   %%----------------------------------------------------------------------------
   % Calculate the share stress on the rim.
-  [~] = shearStress(alpha,b, tStep, rdiv);
+  [~] = shearStress(alpha, b, w0, tStep, rdiv);
 
   %% ---------------------------------------------------------------------------
   % Store results for post processing
@@ -206,14 +222,17 @@ while b*tStep <= tmax
   results.uArr{b} = uArr;
   results.sArr{b} = sArr;
   results.tauArr{b} = tauArr;
-  results.vel(b) = w * 30 / pi;
+  results.vel(b) = w * (30 / pi);
   fprintf('Current time: %5.2f\n', b*tStep)
   fprintf('Iteration %2.0f Complete\n', b)
 
   %% ---------------------------------------------------------------------------
   % Update angular velocity and time
   % ----------------------------------------------------------------------------
-  w = w + alpha(tStep); %initial angular velocity  
+  w = alpha(b*tStep,w0); %initial angular velocity  
+  al(b) = alpha(b*tStep,w0);
+  time(b) = b*tStep;
+  angVel(b) = w;
   b = b + 1;
 
 
