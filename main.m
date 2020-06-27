@@ -27,6 +27,7 @@ rdiv = 30; % number of points per rim to analyze
 delta = [1, 0]/1000; % [mm]
 sigb = [0, 0];
 mats = {'Al7075-T6_Ha2006','CFRP_Run9.mat'};
+load('zeroVelRun9.mat');
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
 
@@ -38,11 +39,12 @@ numberOfSteps = 3;
 compFunc = {'no' @MS_constructed_CFRP}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 600000;
+rpm = 60000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 alpha = 0; %rad/sec^2
 
 % Plotting
+
 plotWhat.rims = rim;
 plotWhat.custom1 = 'no';
 
@@ -225,7 +227,7 @@ fprintf('Descretize Stress/Strain: Complete\n')
 
 %% -----------------------------------------------------------------------------
 % Make Plots
-plotStressStrain()
+plotStressStrain(zeroVelResult)
 
 fprintf('Create Output Plots: Complete\n\n')
 fprintf('Program Complete\n')
