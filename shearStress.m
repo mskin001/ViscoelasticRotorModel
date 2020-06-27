@@ -22,5 +22,3 @@ for k = 1:length(rim) - 1
     rEnd = k*rdiv;
     tau(1,rStart:rEnd) = mat.Q{b,k}(4,4) * (-(a(k)*dr.^2)./4 + (2*C(k))./dr.^2);
 end
-
-disp(tau)
