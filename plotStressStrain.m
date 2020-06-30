@@ -1,4 +1,4 @@
-function plotStressStrain(zeroVelResults)
+function plotStressStrain(results)
 %% -----------------------------------------------------------------------------
 % Define global variables, arrays, and structures
 % ------------------------------------------------------------------------------
@@ -215,9 +215,14 @@ end
 
 if strcmp(plotWhat.radStr, 'yes')
   radStr = figure('Visible','on');
-  zeroVelRadStr = zeroVelResults.sArr(3,:,1)*10^-6;
   hold on
-  plot(rArr*1000,zeroVelRadStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
+  
+  try
+    zeroVelRadStr = results.sArr(3,:,1)*10^-6;
+    plot(rArr*1000,zeroVelRadStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
+  catch
+    %do nothing
+  end
   plot(rArr*1000,sArr(3,:,1)*10^-6,'b-o', 'LineWidth', 1)
   plot(rArr*1000,sArr(3,:,2)*10^-6,'r-d', 'LineWidth', 1)
   plot(rArr*1000,sArr(3,:,3)*10^-6,'k-s', 'LineWidth', 1)
@@ -301,15 +306,19 @@ end
 
 if strcmp(plotWhat.hoopStr, 'yes')
   hoopStr = figure('Visible','on'); %#ok<*NASGU>
-  zeroVelHoopStr = zeroVelResults.sArr(1,:,1)*10^-6;
   hold on
-  plot(rArr*1000,zeroVelHoopStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
+  try
+    zeroVelHoopStr = results.sArr(1,:,1)*10^-6;  
+    plot(rArr*1000,zeroVelHoopStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
+  catch
+    %do nothing
+  end
   plot(rArr*1000,sArr(1,:,1)*10^-6,'b-o', 'LineWidth', 1)
   plot(rArr*1000,sArr(1,:,2)*10^-6,'r-d', 'LineWidth', 1)
   plot(rArr*1000,sArr(1,:,3)*10^-6,'k-s', 'LineWidth', 1)
 
   xlabel('Radius [mm]')
-  ylabel('Hoop Stress [MPa]')
+  ylabel('Circumferential Stress [MPa]')
   legend('\it t = 0, \omega = 0', '\it t = 0', '\it t = 1 yr', '\it t = 5 yrs', 'Location', 'southeast')
   set(gca, 'FontSize', 12)
   grid on

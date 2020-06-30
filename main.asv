@@ -26,7 +26,7 @@ rim = [.05, 0.06, 0.1];
 rdiv = 30; % number of points per rim to analyze
 delta = [1, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_Ha2006','CFRP_Run9.mat'};
+mats = {'Al7075-T6_Ha2006','CFRP_Run3.mat'};
 load('MS_constructedCFRP_zeroVel.mat');
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
@@ -45,7 +45,7 @@ alpha = 0; %rad/sec^2
 
 % Plotting and saving
 saveResult = true;
-fileName = 'Run9.mat';
+fileName = 'Run3.mat';
 plotWhat.rims = rim;
 plotWhat.custom1 = 'no';
 
