@@ -26,7 +26,7 @@ rim = [.05, 0.06, 0.1];
 rdiv = 30; % number of points per rim to analyze
 delta = [1, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_Ha2006','CFRP_Run9.mat'};
+mats = {'Al7075-T6_Ha2006','MS_constructed_CFRP.mat'};
 load('MS_constructedCFRP_zeroVel.mat');
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
@@ -39,19 +39,19 @@ numberOfSteps = 3;
 compFunc = {'no' @MS_constructed_CFRP}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 60000;
+rpm = 0000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 alpha = 0; %rad/sec^2
 
 % Plotting and saving
-saveResult = true;
-fileName = 'Run9.mat';
+saveResult = false;
+resultsFile = 'Run4.mat';
 plotWhat.rims = rim;
 plotWhat.custom1 = 'no';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'no';
+plotWhat.radDis = 'yes';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
@@ -229,14 +229,18 @@ fprintf('Descretize Stress/Strain: Complete\n')
 %% -----------------------------------------------------------------------------
 % Make Plots and save results
 % ------------------------------------------------------------------------------
-plotStressStrain(result)
+try
+  plotStressStrain(result) % include results loaded from resultsFile
+catch
+  plotStressStrain(0) % do not include results from resultsFile
+end
 
 if saveResult
   result.uArr = uArr;
   result.sArr = sArr;
   result.rArr = rArr;
   
-  save(fileName, 'result')
+  save(resultsFile, 'result')
 end
 
 fprintf('Create Output Plots: Complete\n\n')
