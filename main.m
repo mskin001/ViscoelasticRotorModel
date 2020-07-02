@@ -39,7 +39,7 @@ numberOfSteps = 3;
 compFunc = {'no' @MS_constructed_CFRP}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 0000;
+rpm = 60000;
 vdiv = 1; % number of points to analyze between each fixed velocity
 alpha = 0; %rad/sec^2
 

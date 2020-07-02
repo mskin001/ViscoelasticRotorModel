@@ -5,6 +5,7 @@ function plotStressStrain(results)
 global rArr sArr uArr vari
 global plotWhat mat
 
+legendLabels = {'\it t = 0, \omega = 0', '\it t = 0', '\it t = 1 yr', '\it t = 5 yrs'};
 %% -----------------------------------------------------------------------------
 % Define rim origional centers and radii
 % ------------------------------------------------------------------------------
@@ -23,16 +24,6 @@ if strcmp(plotWhat.custom1, 'yes')
   
   srRad = sArr(3,:,1) ./ mat.stren{1}(3);
   srHoop = sArr(1,:,1) ./ mat.stren{1}(1);
-  
-%   srRadInner = sArr(3,1:30,1) ./ mat.stren{1}(3);
-%   srRadOuter = sArr(3,31:end,1) ./ mat.stren{2}(3);
-%   srRad(1:30) = srRadInner;
-%   srRad(31:60) = srRadOuter;
-%   
-%   srHoopInner = sArr(1,1:30,1) ./ mat.stren{1}(1);
-%   srHoopOuter = sArr(1,31:end,1) ./ mat.stren{2}(1);
-%   srHoop(1:30) = srHoopInner;
-%   srHoop(31:60) = srHoopOuter;
   
   radStr = figure();
   haRadData = csvread('Ha99_GFRP_optimized_radialStress.csv');
@@ -55,9 +46,84 @@ if strcmp(plotWhat.custom1, 'yes')
   fprintf('Custom plot 1: Complete\n')
 end
 
-%% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 % Plot displacement
 % ------------------------------------------------------------------------------
+if strcmp(plotWhat.radDis, 'yes')
+  radDis = figure('Visible','on');
+  hold on
+  
+  plot(rArr*1000,uArr(1,:),'b-o', 'LineWidth', 1)
+  plot(rArr*1000,uArr(2,:),'r-d', 'LineWidth', 1)
+  plot(rArr*1000,uArr(3,:),'k-s', 'LineWidth', 1) 
+  
+  xlabel('Radius [mm]')
+  ylabel('Radial Displacement [m]')
+  legend(legendLabels, 'Location', 'southeast')
+  set(gca, 'FontSize', 12)
+  grid on
+  fprintf('Radial Displacement Plot: Complete\n')
+end
+
+% -----------------------------------------------------------------------------
+% Plot radial stress
+% ------------------------------------------------------------------------------
+if strcmp(plotWhat.radStr, 'yes')
+  radStr = figure('Visible','on');
+  hold on
+  
+  try
+    zeroVelRadStr = results.sArr(3,:,1)*10^-6;
+    plot(rArr*1000,zeroVelRadStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
+  catch
+    %do nothing
+  end
+  plot(rArr*1000,sArr(3,:,1)*10^-6,'b-o', 'LineWidth', 1)
+  plot(rArr*1000,sArr(3,:,2)*10^-6,'r-d', 'LineWidth', 1)
+  plot(rArr*1000,sArr(3,:,3)*10^-6,'k-s', 'LineWidth', 1)
+  
+  xlabel('Radius [mm]')
+  ylabel('Radial Stress [MPa]')
+  legend(legendLabels, 'Location', 'southeast')
+  set(gca, 'FontSize', 12)
+  grid on
+  fprintf('Radial Sress Plot: Complete\n')
+end
+
+% -----------------------------------------------------------------------------
+% Plot hoop stress
+% ------------------------------------------------------------------------------
+if strcmp(plotWhat.hoopStr, 'yes')
+  hoopStr = figure('Visible','on'); %#ok<*NASGU>
+  hold on
+  try
+    zeroVelHoopStr = results.sArr(1,:,1)*10^-6;  
+    plot(rArr*1000,zeroVelHoopStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
+  catch
+    %do nothing
+  end
+  plot(rArr*1000,sArr(1,:,1)*10^-6,'b-o', 'LineWidth', 1)
+  plot(rArr*1000,sArr(1,:,2)*10^-6,'r-d', 'LineWidth', 1)
+  plot(rArr*1000,sArr(1,:,3)*10^-6,'k-s', 'LineWidth', 1)
+
+  xlabel('Radius [mm]')
+  ylabel('Circumferential Stress [MPa]')
+  legend(legendLabels, 'Location', 'southeast')
+  set(gca, 'FontSize', 12)
+  grid on
+  fprintf('Hoop Stress Plot: Complete\n')
+end
+
+
+
+
+
+
+%% ------------------------------------------------------------------------
+% Make .gifs
+% -------------------------------------------------------------------------
+
+% ------ Displacement .gifs -----------------------------------------------
 if strcmp(plotWhat.disGif,'yes')
   prog = waitbar(0,'0','Name','Radial Displacement .gif', 'CreateCancelBtn',...
     'setappdata(gcbf,''Canceling'',1)');
@@ -127,25 +193,7 @@ if strcmp(plotWhat.disGif,'yes')
   fprintf('Radial Displacement gif: Complete\n')
 end
 
-if strcmp(plotWhat.radDis, 'yes')
-  radDis = figure('Visible','on');
-  hold on
-  
-  plot(rArr*1000,uArr(1,:),'b-o', 'LineWidth', 1)
-  plot(rArr*1000,uArr(2,:),'r-d', 'LineWidth', 1)
-  plot(rArr*1000,uArr(3,:),'k-s', 'LineWidth', 1) 
-  
-  xlabel('Radius [mm]')
-  ylabel('Radial Displacement [m]')
-  legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
-  set(gca, 'FontSize', 12)
-  grid on
-  fprintf('Radial Displacement Plot: Complete\n')
-end
-
-%% -----------------------------------------------------------------------------
-% Plot radial stress
-% ------------------------------------------------------------------------------
+% ------ Radial Str .gif --------------------------------------------------
 if strcmp(plotWhat.radGif, 'yes')
   prog = waitbar(0,'0','Name','Radial Stress .gif', 'CreateCancelBtn',...
     'setappdata(gcbf,''Canceling'',1)');
@@ -213,31 +261,7 @@ if strcmp(plotWhat.radGif, 'yes')
   fprintf('Radial Sress gif: Complete\n')
 end
 
-if strcmp(plotWhat.radStr, 'yes')
-  radStr = figure('Visible','on');
-  hold on
-  
-  try
-    zeroVelRadStr = results.sArr(3,:,1)*10^-6;
-    plot(rArr*1000,zeroVelRadStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
-  catch
-    %do nothing
-  end
-  plot(rArr*1000,sArr(3,:,1)*10^-6,'b-o', 'LineWidth', 1)
-  plot(rArr*1000,sArr(3,:,2)*10^-6,'r-d', 'LineWidth', 1)
-  plot(rArr*1000,sArr(3,:,3)*10^-6,'k-s', 'LineWidth', 1)
-  
-  xlabel('Radius [mm]')
-  ylabel('Radial Stress [MPa]')
-  legend('\it t = 0, \omega = 0', '\it t = 0', '\it t = 1 yr', '\it t = 5 yrs', 'Location', 'southeast')
-  set(gca, 'FontSize', 12)
-  grid on
-  fprintf('Radial Sress Plot: Complete\n')
-end
-
-%% -----------------------------------------------------------------------------
-% Plot hoop stress
-% ------------------------------------------------------------------------------
+% ------ Hoop str .gif ----------------------------------------------------
 if strcmp(plotWhat.hoopGif, 'yes')
   prog = waitbar(0,'0','Name','Hoop Stress .gif', 'CreateCancelBtn',...
     'setappdata(gcbf,''Canceling'',1)');
@@ -304,24 +328,12 @@ if strcmp(plotWhat.hoopGif, 'yes')
   fprintf('Hoop Stress gif: Complete\n')
 end
 
-if strcmp(plotWhat.hoopStr, 'yes')
-  hoopStr = figure('Visible','on'); %#ok<*NASGU>
-  hold on
-  try
-    zeroVelHoopStr = results.sArr(1,:,1)*10^-6;  
-    plot(rArr*1000,zeroVelHoopStr, '--', 'Color', [0.4660 0.6740 0.1880], 'LineWidth', 2)
-  catch
-    %do nothing
-  end
-  plot(rArr*1000,sArr(1,:,1)*10^-6,'b-o', 'LineWidth', 1)
-  plot(rArr*1000,sArr(1,:,2)*10^-6,'r-d', 'LineWidth', 1)
-  plot(rArr*1000,sArr(1,:,3)*10^-6,'k-s', 'LineWidth', 1)
 
-  xlabel('Radius [mm]')
-  ylabel('Circumferential Stress [MPa]')
-  legend('\it t = 0, \omega = 0', '\it t = 0', '\it t = 1 yr', '\it t = 5 yrs', 'Location', 'southeast')
-  set(gca, 'FontSize', 12)
-  grid on
-  fprintf('Hoop Stress Plot: Complete\n')
-end
+
+
+
+
+
+
+
 
