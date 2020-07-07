@@ -13,6 +13,8 @@ end
 hold on
 plot(time,expo,'LineWidth',2)
 
+figure(2)
+semilogx(time,expo,'LineWidth',2)
 % t = linspace(0,20,101);
 % t = 0.2;
 % b = 2356.2; % amplitude

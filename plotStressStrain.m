@@ -2,7 +2,7 @@ function plotStressStrain(legTxt)
 %% -----------------------------------------------------------------------------
 % Define global variables, arrays, and structures
 % ------------------------------------------------------------------------------
-global rim rArr plotWhat results mat
+global rim rArr plotWhat results
 uArr = results.uArr;
 sArr = results.sArr;
 tau =  results.tauArr;
@@ -22,28 +22,7 @@ or = rim;
 halfWay = round(length(sArr)/2);
 
 if strcmp(plotWhat.custom1, 'yes')
-  nr = rArr ./ min(rArr);
-
-  srRad = sArr(3,:,1) ./ mat.stren{1}(3);
-  srHoop = sArr(1,:,1) ./ mat.stren{1}(1);
-
-  radStr = figure();
-  haRadData = csvread('Ha99_GFRP_optimized_radialStress.csv');
-  hahoopData = csvread('Ha99_GFRP_optimized_hoopStress.csv');
-  hold on
-  plot(haRadData(:,1),haRadData(:,2),'kv-', 'MarkerFaceColor', 'k')
-  plot(hahoopData(:,1),hahoopData(:,2),'k^-', 'MarkerFaceColor', 'k')
-  plot(nr,srRad,'b--s', 'LineWidth', 1)
-  plot(nr,srHoop, 'r--o', 'LineWidth', 1)
-
-  axialStr = figure();
-  plot(rArr,sArr(2,:,1),'bo-');
-%   axis([0.5, 1, -1, 3]);
-  grid on
-  xlabel('r/r_{min}')
-  ylabel('Normalized Stress')
-  set(gca, 'FontSize', 12)
-  legend('Ha 1999 Radial', 'Ha 1999 Circumfrential','Model Radial','Model Circumfrential', 'Location', 'SouthEast')
+	
 
   fprintf('Custom plot 1: Complete\n')
 end

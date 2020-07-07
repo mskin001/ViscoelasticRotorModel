@@ -15,24 +15,22 @@ global mat plotWhat results
 % simulation type:
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
-  % qdve = quasi-dynamic viscoelasticu
 st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-rim = [.05, 0.1];
-% rim = [0.08, 0.2];
+% rim = [.05, 0.1];
+rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = [0]/1000; % [mm]
-sigb = [-30e6, 0];
+delta = 0/1000; % [mm]
+sigb = [0, 0];
 % mats = {'GFRP_Aparicio2011.mat'};
-% mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
-mats = {'CFRP_Aparicio2011.mat'};
+mats = {'GFRP_Aparicio2011.mat'};
 
 % Time/creep
-tmax = 20; %seconds?
-tStep = 0.2; %second between steps
+tmax = 0.005; %seconds?
+tStep = 0.005; %second between steps
 % tArr = [1, 8760/2, 8760];
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
@@ -40,36 +38,40 @@ numberOfSteps = 3;
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 50000;
-rpmMax = 98000;
-
+rpm = 17.452;
+rpmMax = 17.452;
 accType = 'const';
 
-% Constant
-alpha = @(t,wIni) 250*t;
-
-% Linear Acceleration:
-% alpha = @(t,wIni) wIni + 230*t;
-
-% Exponential growth: (Use this one)
-% alpha = @(t,wIni) wIni + 1.089^(5*t);
-
-% Sin behavior:
-% alpha = @(t,wIni) sin: wIni + 2356.2*sin((2*pi/40)*t + (3*pi/2)) + 2356.2
-
+% The following if statment controls which acceleration function is used
+% based on the variable string accType. This variable is also referenced in
+% main.m and shearStress.m. Apply changes with caution.
+if strcmp(accType, 'const')
+  % Constant
+%   alpha = @(t,wIni) 250*t;
+  alpha = @(t,wIni) 3.6e6 * t;
+elseif strcmp(accType, 'Linear')
+  % Linear Acceleration:
+  alpha = @(t,wIni) wIni + 230*t;
+elseif strcmp(accType, 'Exponential')
+  % Exponential growth: (Use this one)
+  alpha = @(t,wIni) wIni + 1.089^(5*t);
+else
+  % Sin behavior:
+  alpha = @(t,wIni) sin: wIni + 2356.2*sin((2*pi/40)*t + (3*pi/2)) + 2356.2;
+end
 %-------------------
 % %Exponential behavior:
 % T = tmax / log(rpmMax/rpm);
 % alpha = @(t,wIni) (wIni * exp(t/T));
 
-vdiv = 1; % number of points to analyze between each fixed velocity
 % Plotting
-plotWhat.custom1 = 'no';
+legTxt = {'0 sec', '25 sec', '50 sec', '75 sec', '100 sec'}; % Controls legend entries for graphs
+plotWhat.custom1 = 'yes';
 plotWhat.radDis = 'no';
-plotWhat.radStr = 'yes';         % Radial stress v. radius plot
-plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
-plotWhat.shearStr = 'yes';
-plotWhat.peakStr = 'yes';
+plotWhat.radStr = 'no';         % Radial stress v. radius plot
+plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.shearStr = 'no';
+plotWhat.peakStr = 'no';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
@@ -81,7 +83,7 @@ plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 plotWhat.interval = 25;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
                                  %   0 is fastest
-legTxt = {'0 sec', '25 sec', '50 sec', '75 sec', '100 sec'};
+
 
 %% -----------------------------------------------------------------------------
 % Start Program
@@ -147,9 +149,6 @@ elseif strcmp(st,'ve')
 elseif strcmp(st,'qdve')
   error('Simulation type not supported\n')
 
-  if length(rpm) > 1 && vdiv < 2 %#ok<UNRCH>
-    warning('vdiv is less than 2. To study changes in velocity this should be 2 or larger\n')
-  end
 else
   error('Simulation type not specified or not supported.\n')
 end
@@ -236,7 +235,8 @@ while b*tStep <= tmax
   % ----------------------------------------------------------------------------
   
   if strcmp(accType, 'const')
-    w = w + alpha(tStep,w0);
+%     w = w + alpha(tStep,w0);
+    
   else
     w = alpha(b*tStep,w0);
   end
