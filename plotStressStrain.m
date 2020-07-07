@@ -1,9 +1,8 @@
-function plotStressStrain()
+function plotStressStrain(legTxt)
 %% -----------------------------------------------------------------------------
 % Define global variables, arrays, and structures
 % ------------------------------------------------------------------------------
 global rim rArr plotWhat results mat
-
 uArr = results.uArr;
 sArr = results.sArr;
 tau =  results.tauArr;
@@ -27,16 +26,6 @@ if strcmp(plotWhat.custom1, 'yes')
 
   srRad = sArr(3,:,1) ./ mat.stren{1}(3);
   srHoop = sArr(1,:,1) ./ mat.stren{1}(1);
-
-%   srRadInner = sArr(3,1:30,1) ./ mat.stren{1}(3);
-%   srRadOuter = sArr(3,31:end,1) ./ mat.stren{2}(3);
-%   srRad(1:30) = srRadInner;
-%   srRad(31:60) = srRadOuter;
-%
-%   srHoopInner = sArr(1,1:30,1) ./ mat.stren{1}(1);
-%   srHoopOuter = sArr(1,31:end,1) ./ mat.stren{2}(1);
-%   srHoop(1:30) = srHoopInner;
-%   srHoop(31:60) = srHoopOuter;
 
   radStr = figure();
   haRadData = csvread('Ha99_GFRP_optimized_radialStress.csv');
@@ -66,29 +55,20 @@ end
 % -------------- Radial displacements ------------------------------------------
 if strcmp(plotWhat.radDis, 'yes')
   radDis = figure('Visible','on');
-
-%   TzengInitial = csvread('Tzeng2001RadialDispInitial.csv');
-%   TzengMid = csvread('Tzeng2001RadialDispMid.csv');
-%   TzengInf = csvread('Tzeng2001RadialDispInf.csv');
-%   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
-%   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
-%   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-%   plot(rArr*39.3701,uArr(2,:)*39.3701,'g-o')
-%   plot(rArr*39.3701,uArr(end,:)*39.3701,'r-o')
   hold on
   try
-    subSet = uArr(1:plotWhat.interval:end);
+    subSet = uArr(plotWhat.interval:plotWhat.interval:end);
   catch
     subSet = uArr;
   end
 
   hold on
   for k = 1:length(subSet)
-    plot(rArr*1000, subSet{k}(1,:)*10^-6, 'LineWidth', 1);
+    plot(rArr*1000, subSet{k}(1,:)*10^-6, 'LineWidth', 1.5);
   end
   xlabel('Radius [mm]')
   ylabel('Radial Displacement [m]')
-  legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
+  legend(legTxt, 'Location', 'southeast')
 %   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
@@ -98,29 +78,23 @@ end
 % -------------- Radial stress -------------------------------------------------
 if strcmp(plotWhat.radStr, 'yes')
   radStr = figure('Visible','on');
-
-%   TzengInitial = csvread('Tzeng2001RadialStrInitial.csv');
-%   TzengMid = csvread('Tzeng2001RadialStrMid.csv');
-%   TzengInf = csvread('Tzeng2001RadialStrInf.csv');
-%   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
-%   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
-%   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-%   plot(rArr*39.3701,sArr(3,:,2)*0.000145038,'g-o')
-%   plot(rArr*39.3701,sArr(3,:,end)*0.000145038,'r-o')
   hold on
+  
+  
   try
-    subSet = sArr(1:plotWhat.interval:end);
+    subSet = sArr(plotWhat.interval:plotWhat.interval:end);
   catch
     subSet = sArr;
   end
 
   hold on
+  plot(rArr*1000, sArr{1}(3,:,1)*10^-6, 'LineWidth', 1.5)
   for k = 1:length(subSet)
-    plot(rArr*1000, subSet{k}(3,:,1)*10^-6, 'LineWidth', 1);
+    plot(rArr*1000, subSet{k}(3,:,1)*10^-6, 'LineWidth', 1.5);
   end
   xlabel('Radius [mm]')
   ylabel('Radial Stress [MPa]')
-  legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
+  legend(legTxt, 'Location', 'southeast')
 %   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
   set(gca, 'FontSize', 12)
   grid on
@@ -130,31 +104,24 @@ end
 % -------------- Hoop stress ---------------------------------------------------
 if strcmp(plotWhat.hoopStr, 'yes')
   hoopStr = figure('Visible','on'); %#ok<*NASGU>
-%   TzengInitial = csvread('Tzeng2001HoopInitial.csv');
-%   TzengMid = csvread('Tzeng2001HoopMid.csv');
-%   TzengInf = csvread('Tzeng2001HoopInf.csv');
   hold on
-%   plot(TzengInitial(:,1),TzengInitial(:,2),'k^-','MarkerFaceColor','k')
-%   plot(TzengMid(:,1),TzengMid(:,2),'kv-','MarkerFaceColor','k')
-%   plot(TzengInf(:,1),TzengInf(:,2),'k>-','MarkerFaceColor','k')
-%   plot(rArr*39.3701,sArr(1,:,2)*0.000145038,'g-o')
-%   plot(rArr*39.3701,sArr(1,:,end)*0.000145038,'r-*')
+
   try
-    subSet = sArr(1:plotWhat.interval:end);
+    subSet = sArr(plotWhat.interval:plotWhat.interval:end);
   catch
     subSet = sArr;
   end
 
   hold on
+  plot(rArr*1000, sArr{1}(1,:,1)*10^-6, 'LineWidth', 1.5)
   for k = 1:length(subSet)
-    plot(rArr*1000, subSet{k}(1,:,1)*10^-6, 'LineWidth', 1);
+    plot(rArr*1000, subSet{k}(1,:,1)*10^-6, 'LineWidth', 1.5);
   end
 
 
   xlabel('Radius [mm]')
   ylabel('Hoop Stress [MPa]')
-  legend('Time 0', '6 months', '1 year', 'Location', 'southeast')
-%   legend('Tzeng Initial', 'Tzeng 10 years', 'Tzeng Infinite', 'Initial','10 Years', 'Infinite')
+  legend(legTxt, 'Location', 'southeast')
   set(gca, 'FontSize', 12)
   grid on
   fprintf('Hoop Stress Plot: Complete\n')
@@ -164,18 +131,20 @@ end
 if strcmp(plotWhat.shearStr, 'yes')
   shearStr = figure('Visible', 'on');
   try
-    tauSubSet = tau(1:plotWhat.interval:end); % select tau of interest to plot
+    tauSubSet = tau(plotWhat.interval:plotWhat.interval:end); % select tau of interest to plot
   catch
     % warning('Failed to limit tau to descrete intervals. Plotting all tau.')
     tauSubSet = tau;
   end
 
   hold on
+  plot(rArr*1000, tau{1}*10^-6, 'LineWidth', 1.5)
   for k = 1:length(tauSubSet)
-    plot(rArr*1000,tauSubSet{k}*10^-6, 'LineWidth', 1);
+    plot(rArr*1000,tauSubSet{k}*10^-6, 'LineWidth', 1.5);
   end
   xlabel('Radius [mm]')
   ylabel('Shear Stress [MPa]')
+  legend(legTxt, 'Location', 'northeast')
   set(gca, 'FontSize', 12)
   fprintf('Shear Stress Plot: Complete\n')
 end
@@ -185,8 +154,9 @@ end
 if strcmp(plotWhat.peakStr, 'yes')
   peakStr = figure('Visible','on');
   hold on
-  yyaxis left; plot(results.vel,results.peakloc*1000);
-  yyaxis right; plot(results.vel,results.peakstr);
+  yyaxis left; plot(results.time,results.peakloc*1000, 'LineWidth', 1.5);
+  yyaxis right; plot(results.time,results.peakstr, 'LineWidth', 1.5);
+  yyaxis right; plot(results.time, ones(length(results.time)), 'k--', 'LineWidth', 1.5)
 
 end
 
@@ -195,7 +165,7 @@ yyaxis left
 ylabel('Peak Stress Location [m]')
 yyaxis right
 ylabel('Strength Ratio')
-
+set(gca, 'FontSize', 12)
 
 %% -----------------------------------------------------------------------------
 % Make .gifs

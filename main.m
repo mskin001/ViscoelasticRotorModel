@@ -43,28 +43,32 @@ compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep mode
 rpm = 50000;
 rpmMax = 98000;
 
+accType = 'const';
+
+% Constant
+alpha = @(t,wIni) 250*t;
+
 % Linear Acceleration:
 % alpha = @(t,wIni) wIni + 230*t;
 
 % Exponential growth: (Use this one)
-alpha = @(t,wIni) wIni + 1.089^(5*t);
+% alpha = @(t,wIni) wIni + 1.089^(5*t);
+
+% Sin behavior:
+% alpha = @(t,wIni) sin: wIni + 2356.2*sin((2*pi/40)*t + (3*pi/2)) + 2356.2
 
 %-------------------
 % %Exponential behavior:
 % T = tmax / log(rpmMax/rpm);
 % alpha = @(t,wIni) (wIni * exp(t/T));
 
-%------------------
-% Sin behavior:
-% alpha = @(t,wIni) sin: wIni + 2356.2*sin((2*pi/40)*t + (3*pi/2)) + 2356.2
-                            
 vdiv = 1; % number of points to analyze between each fixed velocity
 % Plotting
 plotWhat.custom1 = 'no';
 plotWhat.radDis = 'no';
-plotWhat.radStr = 'no';         % Radial stress v. radius plot
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
-plotWhat.shearStr = 'no';
+plotWhat.radStr = 'yes';         % Radial stress v. radius plot
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
+plotWhat.shearStr = 'yes';
 plotWhat.peakStr = 'yes';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
@@ -74,9 +78,10 @@ plotWhat.radialGifName = 'Radial Stress.gif';
 plotWhat.hoopGifName = 'Hoop Stress.gif';
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 
-plotWhat.interval = 15;           % Display time interval on figures
+plotWhat.interval = 25;           % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
                                  %   0 is fastest
+legTxt = {'0 sec', '25 sec', '50 sec', '75 sec', '100 sec'};
 
 %% -----------------------------------------------------------------------------
 % Start Program
@@ -161,7 +166,7 @@ vari = cast(tmax/tStep,'single');
 b = 1;
 
 while b*tStep <= tmax
-  fprintf('Create Variable Arrays: Complete\n')
+%   fprintf('Create Variable Arrays: Complete\n')
   %% ---------------------------------------------------------------------------
   % Preallocate variables
   % ----------------------------------------------------------------------------
@@ -214,7 +219,7 @@ while b*tStep <= tmax
 
   %%----------------------------------------------------------------------------
   % Calculate the share stress on the rim.
-  [~] = shearStress(alpha, b, w0, tStep, rdiv);
+  [~] = shearStress(alpha, accType, b, w0, tStep, rdiv);
 
   %% ---------------------------------------------------------------------------
   % Store results for post processing
@@ -223,16 +228,22 @@ while b*tStep <= tmax
   results.sArr{b} = sArr;
   results.tauArr{b} = tauArr;
   results.vel(b) = w * (30 / pi);
-  fprintf('Current time: %5.2f\n', b*tStep)
-  fprintf('Iteration %2.0f Complete\n', b)
+%   fprintf('Current time: %5.2f\n', b*tStep)
+%   fprintf('Iteration %2.0f Complete\n', b)
 
   %% ---------------------------------------------------------------------------
   % Update angular velocity and time
   % ----------------------------------------------------------------------------
-  w = alpha(b*tStep,w0); %initial angular velocity  
-  al(b) = alpha(b*tStep,w0);
-  time(b) = b*tStep;
-  angVel(b) = w;
+  
+  if strcmp(accType, 'const')
+    w = w + alpha(tStep,w0);
+  else
+    w = alpha(b*tStep,w0);
+  end
+  results.time(b) = b*tStep;
+  
+%   al(b) = alpha(b*tStep,w0);
+
   b = b + 1;
 
 
@@ -245,7 +256,7 @@ end
 %% -----------------------------------------------------------------------------
 % Make Plots
 % ------------------------------------------------------------------------------
-plotStressStrain()
+plotStressStrain(legTxt)
 
-fprintf('Create Output Plots: Complete\n\n')
+% fprintf('Create Output Plots: Complete\n\n')
 fprintf('Program Complete\n')
