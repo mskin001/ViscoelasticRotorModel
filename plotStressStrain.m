@@ -99,8 +99,8 @@ if strcmp(plotWhat.hoopStr, 'yes')
 
 
   xlabel('Radius [mm]')
-  ylabel('Hoop Stress [MPa]')
-  legend(legTxt, 'Location', 'southeast')
+  ylabel('Circumferential Stress [MPa]')
+  legend(legTxt, 'Location', 'southeast', 'NumColumns', 5)
   set(gca, 'FontSize', 12)
   grid on
   fprintf('Hoop Stress Plot: Complete\n')
@@ -117,12 +117,12 @@ if strcmp(plotWhat.shearStr, 'yes')
   end
 
   hold on
-  plot(rArr*1000, tau{1}*10^-6, 'LineWidth', 1.5)
+%   plot(rArr*1000, tau{1}*10^-6, 'LineWidth', 1.5)
   for k = 1:length(tauSubSet)
-    plot(rArr*1000,tauSubSet{k}*10^-6, 'LineWidth', 1.5);
+    plot(rArr*1000,tauSubSet{k}, 'LineWidth', 1.5);
   end
   xlabel('Radius [mm]')
-  ylabel('Shear Stress [MPa]')
+  ylabel('Shear Stress [Pa]')
   legend(legTxt, 'Location', 'northeast')
   set(gca, 'FontSize', 12)
   fprintf('Shear Stress Plot: Complete\n')

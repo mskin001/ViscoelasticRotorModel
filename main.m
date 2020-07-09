@@ -19,18 +19,18 @@ st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-% rim = [.05, 0.1];
-rim = [0.08, 0.2]; % Perez-Aparicio 2011
+rim = [.05, 0.1];
+% rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = 0/1000; % [mm]
-sigb = [0, 0];
+sigb = [-30e6, 0];
 % mats = {'GFRP_Aparicio2011.mat'};
-mats = {'GFRP_Aparicio2011.mat'};
+mats = {'CFRP_Aparicio2011.mat'};
 
 % Time/creep
-tmax = 0.005; %seconds?
-tStep = 0.005; %second between steps
+tmax = 20; %seconds?
+tStep = 0.2; %second between steps
 % tArr = [1, 8760/2, 8760];
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
@@ -38,8 +38,8 @@ numberOfSteps = 3;
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 17.452;
-rpmMax = 17.452;
+rpm = 50000;
+rpmMax = 98900;
 accType = 'const';
 
 % The following if statment controls which acceleration function is used
@@ -47,11 +47,11 @@ accType = 'const';
 % main.m and shearStress.m. Apply changes with caution.
 if strcmp(accType, 'const')
   % Constant
-%   alpha = @(t,wIni) 250*t;
-  alpha = @(t,wIni) 3.6e6 * t;
+  alpha = @(t,wIni) 250*t; % gets multiplied by tStep at end of while loop
+  % alpha = @(t,wIni) 3.6e6 * t;
 elseif strcmp(accType, 'Linear')
   % Linear Acceleration:
-  alpha = @(t,wIni) wIni + 230*t;
+  alpha = @(t,wIni) wIni + 230*t; % gets multiplied by b*tStep at end of while loop
 elseif strcmp(accType, 'Exponential')
   % Exponential growth: (Use this one)
   alpha = @(t,wIni) wIni + 1.089^(5*t);
@@ -66,12 +66,12 @@ end
 
 % Plotting
 legTxt = {'0 sec', '25 sec', '50 sec', '75 sec', '100 sec'}; % Controls legend entries for graphs
-plotWhat.custom1 = 'yes';
-plotWhat.radDis = 'no';
-plotWhat.radStr = 'no';         % Radial stress v. radius plot
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
-plotWhat.shearStr = 'no';
-plotWhat.peakStr = 'no';
+plotWhat.custom1 = 'yes';        % any custom plot. Go to plotStressStrain.m to modify (first if statement)
+plotWhat.radDis = 'no';          % Radial displacement v. radius
+plotWhat.radStr = 'yes';         % Radial stress v. radius plot
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
+plotWhat.shearStr = 'yes';       % Shear stress v. radius
+plotWhat.peakStr = 'yes';        % 2-yaxis plot. Peak stress location and SR v. time
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
@@ -80,7 +80,7 @@ plotWhat.radialGifName = 'Radial Stress.gif';
 plotWhat.hoopGifName = 'Hoop Stress.gif';
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
 
-plotWhat.interval = 25;           % Display time interval on figures
+plotWhat.interval = 25;          % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
                                  %   0 is fastest
 
@@ -235,8 +235,7 @@ while b*tStep <= tmax
   % ----------------------------------------------------------------------------
   
   if strcmp(accType, 'const')
-%     w = w + alpha(tStep,w0);
-    
+    w = w + alpha(tStep,w0);
   else
     w = alpha(b*tStep,w0);
   end
