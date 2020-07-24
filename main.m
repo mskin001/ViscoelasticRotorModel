@@ -34,7 +34,6 @@ tStep = 0.2; %second between steps
 % tArr = [1, 8760/2, 8760];
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
-numberOfSteps = 3;
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
