@@ -65,12 +65,12 @@ end
 % alpha = @(t,wIni) (wIni * exp(t/T));
 
 % Plotting
-legTxt = {'0 sec', '25 sec', '50 sec', '75 sec', '100 sec'}; % Controls legend entries for graphs
+legTxt = {'0 sec', '5 sec', '10 sec', '15 sec', '20 sec'}; % Controls legend entries for graphs
 plotWhat.custom1 = 'yes';        % any custom plot. Go to plotStressStrain.m to modify (first if statement)
 plotWhat.radDis = 'no';          % Radial displacement v. radius
-plotWhat.radStr = 'yes';         % Radial stress v. radius plot
-plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
-plotWhat.shearStr = 'yes';       % Shear stress v. radius
+plotWhat.radStr = 'no';         % Radial stress v. radius plot
+plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.shearStr = 'no';       % Shear stress v. radius
 plotWhat.peakStr = 'yes';        % 2-yaxis plot. Peak stress location and SR v. time
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
@@ -251,7 +251,17 @@ end
 %% -----------------------------------------------------------------------------
 % Calculate failure criterion
 % ------------------------------------------------------------------------------
-[F] = failureIndex(rdiv);
+[SR] = failureIndex(rdiv);
+
+figure()
+hold on
+plot(rArr*1000,SR(15,:), '-o','MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
+plot(rArr*1000,SR(45,:), '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
+ylabel('SR')
+xlabel('Radius [mm]')
+legend('SR \it t=3', 'SR \it t=9')
+set(gca, 'Fontsize', 12)
+
 %% -----------------------------------------------------------------------------
 % Make Plots
 % ------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-function [R] = failureIndex(rdiv)
+function [strRatio] = failureIndex(rdiv)
 
 global results rArr rim mat vari
 
@@ -28,7 +28,6 @@ for b = 1:vari
     A = Ftt*sigt.^2 + 2*Ftr*sigt.*sigr + Frr*sigr.^2 + Fs*tau;
     B = Ft*sigt + Fr*sigr;
     C = -1;
-
     R(b,rStart:rEnd) = (-B + sqrt(B.^2 - 4*A*C)) ./ (2*A);
     strRatio(b,rStart:rEnd) = R(b,rStart:rEnd).^-1;
 

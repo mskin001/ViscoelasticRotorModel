@@ -133,17 +133,18 @@ end
 if strcmp(plotWhat.peakStr, 'yes')
   peakStr = figure('Visible','on');
   hold on
-  yyaxis left; plot(results.time,results.peakloc*1000, 'LineWidth', 1.5);
-  yyaxis right; plot(results.time,results.peakstr, 'LineWidth', 1.5);
-  yyaxis right; plot(results.time, ones(length(results.time)), 'k--', 'LineWidth', 1.5)
+  yyaxis left; plot(results.vel,results.peakloc*1000, '-', 'Color', [0 0.4470 0.7410], 'MarkerIndices', 1:10:results.vel, 'LineWidth', 1.5);
+  yyaxis right; plot(results.vel,results.peakstr, '-.o', 'MarkerIndices', 1:10:results.vel, 'LineWidth', 1.5);
+  yyaxis right; plot(results.vel, ones(length(results.time)), 'k--', 'LineWidth', 1.5)
 
 end
 
 xlabel('Angular velocity [rpm]')
 yyaxis left
-ylabel('Peak Stress Location [m]')
+ylabel('Peak SR Location [mm]')
 yyaxis right
 ylabel('Strength Ratio')
+legend('Peak SR Location', 'SR value', 'Location', 'southeast')
 set(gca, 'FontSize', 12)
 
 %% -----------------------------------------------------------------------------
