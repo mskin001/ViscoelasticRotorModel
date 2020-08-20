@@ -23,6 +23,6 @@ s = 1/Em + (1/Ek)*(1-exp(expo)) + t/nu_m; % transverse
 % s(5:6) = mstiff(6); %poisons ratio
 
 plot(t,s*10^9, 'LineWidth', 1.5)
-xlabel('time [hr]')
+xlabel('Time [hr]')
 ylabel('Compliance [1/GPa]')
 set(gca,'FontSize',12)
