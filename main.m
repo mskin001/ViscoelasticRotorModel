@@ -19,14 +19,14 @@ st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-rim = [.05, 0.1];
+rim = [.05, 0.1, 0.2];
 % rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = 0/1000; % [mm]
+delta = [0, 0]/1000; % [mm]
 sigb = [-30e6, 0];
 % mats = {'GFRP_Aparicio2011.mat'};
-mats = {'CFRP_Aparicio2011.mat'};
+mats = {'GFRP_Aparicio2011', 'CFRP_Aparicio2011.mat'};
 
 % Time/creep
 tmax = 20; %seconds?
