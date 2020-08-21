@@ -11,8 +11,8 @@ files = dir(fileName);
 for k = 3:length(files)
 
     load(files(k).name);
-    rad = sArr(3,:,:);
-    hoop = sArr(1,:,:);
+    rad = result.sArr(3,:,:);
+    hoop = result.sArr(1,:,:);
 
     for i = 1:3
         [rMax((k-2),i),indR] = max(abs(rad(:,:,i)));
@@ -32,12 +32,12 @@ for k = 3:length(files)
 %     l = l + 2;
 end
 
-r6M = ((rMax(:,1)-rMax(:,2)) ./ rMax(:,1)) * 100;
-r1Y = ((rMax(:,1)-rMax(:,3)) ./ rMax(:,1)) * 100;
+r6M = ((rMax(:,1)-rMax(:,2)) ./ rMax(:,1)) * -100;
+r1Y = ((rMax(:,1)-rMax(:,3)) ./ rMax(:,1)) * -100;
 rpl = [r6M, r1Y];
 
-h6M = ((hMax(:,1) - hMax(:,2)) ./ hMax(:,1)) * 100;
-h1Y = ((hMax(:,1) - hMax(:,3)) ./ hMax(:,1)) * 100;
+h6M = ((hMax(:,1) - hMax(:,2)) ./ hMax(:,1)) * -100;
+h1Y = ((hMax(:,1) - hMax(:,3)) ./ hMax(:,1)) * -100;
 hpl = [h6M, h1Y];
 
 
