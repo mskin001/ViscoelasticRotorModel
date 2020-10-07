@@ -22,7 +22,7 @@ or = rim;
 halfWay = round(length(sArr)/2);
 
 if strcmp(plotWhat.custom1, 'yes')
-	
+
 
   fprintf('Custom plot 1: Complete\n')
 end
@@ -58,8 +58,8 @@ end
 if strcmp(plotWhat.radStr, 'yes')
   radStr = figure('Visible','on');
   hold on
-  
-  
+
+
   try
     subSet = sArr(plotWhat.interval:plotWhat.interval:end);
   catch
@@ -117,12 +117,14 @@ if strcmp(plotWhat.shearStr, 'yes')
   end
 
   hold on
-%   plot(rArr*1000, tau{1}*10^-6, 'LineWidth', 1.5)
-  for k = 1:length(tauSubSet)
-    plot(rArr*1000,tauSubSet{k}, 'LineWidth', 1.5);
-  end
+  plot(rArr*1000, tau{1}*10^-6, 'LineWidth', 1.5)
+  stressData = csvread('salhian_shear_stress.csv', 1, 0);
+  plot(stressData(:,1)*1000, stressData(:,2), 'k*')
+%   for k = 1:length(tauSubSet)
+%     plot(rArr*1000,tauSubSet{k}, 'LineWidth', 1.5);
+%   end
   xlabel('Radius [mm]')
-  ylabel('Shear Stress [Pa]')
+  ylabel('Shear Stress [MPa]')
   legend(legTxt, 'Location', 'northeast')
   set(gca, 'FontSize', 12)
   fprintf('Shear Stress Plot: Complete\n')
@@ -137,15 +139,16 @@ if strcmp(plotWhat.peakStr, 'yes')
   yyaxis right; plot(results.vel,results.peakstr, '-.o', 'MarkerIndices', 1:10:results.vel, 'LineWidth', 1.5);
   yyaxis right; plot(results.vel, ones(length(results.time)), 'k--', 'LineWidth', 1.5)
 
+	xlabel('Angular velocity [rpm]')
+	yyaxis left
+	ylabel('Peak SR Location [mm]')
+	yyaxis right
+	ylabel('Strength Ratio')
+	legend('Peak SR Location', 'SR value', 'Location', 'southeast')
+	set(gca, 'FontSize', 12)
 end
 
-xlabel('Angular velocity [rpm]')
-yyaxis left
-ylabel('Peak SR Location [mm]')
-yyaxis right
-ylabel('Strength Ratio')
-legend('Peak SR Location', 'SR value', 'Location', 'southeast')
-set(gca, 'FontSize', 12)
+
 
 %% -----------------------------------------------------------------------------
 % Make .gifs

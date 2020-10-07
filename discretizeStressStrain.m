@@ -27,7 +27,6 @@ global mat rim U w rArr uArr sArr eArr
 % ------------------------------------------------------------------------------
 b = 1; % leftover from viscoelastic work. Left in for potential future work.
 for k = 1:length(rim)-1
-  disp(k)
   Q11 = mat.Q{b,k}(1,1);
   Q13 = mat.Q{b,k}(1,3);
   Q33 = mat.Q{b,k}(3,3);
@@ -41,7 +40,7 @@ for k = 1:length(rim)-1
   % Calculate absolute displacement at the inner and outer surface of each rim
   u = [U(b,k); U(b,k+1) - delta(k)];
   iota = diag([fi1,fi2]);
-  uw = -mat.rho{k}*w^2*fi0*[rim(k)^3; rim(k+1)^3];
+  uw = -mat.rho{k}(rim(k))*w^2*fi0*[rim(k)^3; rim(k+1)^3];
   G = [rim(k)^kappa rim(k)^-kappa; rim(k+1)^kappa rim(k+1)^-kappa];
   C = (G*iota)\(u - uw);
 
@@ -52,12 +51,12 @@ for k = 1:length(rim)-1
   rArr(rvstart:rvend) = rv;
 
   % Calculate discrete displacement vector
-  dv = -mat.rho{k}*w^2*fi0*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
+  dv = -mat.rho{k}(rv).*w^2*fi0.*rv.^3 + C(1)*fi1*rv.^kappa + C(2)*fi2*rv.^-kappa;
   uArr(b,rvstart:rvend) = dv; % Discrete displacement throughout the rim
 
   % Strain
   e1 = dv ./ rv;
-  e3 = -3*mat.rho{k}*w^2*fi0*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
+  e3 = -3*mat.rho{k}(rv).*w^2*fi0.*rv.^2 + kappa*(C(1)*fi1*rv.^(kappa-1) - C(2)*fi2*rv.^(-kappa-1));
   e2 = zeros(size(e1)); % no strain in the axial or shear directions
   e4 = zeros(size(e1));
   eArr = [e1; e2; e3; e4]; % strain in each direction [hoop, axial, raidal, shear]

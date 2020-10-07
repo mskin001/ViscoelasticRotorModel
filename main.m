@@ -19,18 +19,18 @@ st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-rim = [.05, 0.1, 0.2];
+rim = [.1, 0.8];
 % rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
-delta = [0, 0]/1000; % [mm]
+delta = [0]/1000; % [mm]
 sigb = [-30e6, 0];
 % mats = {'GFRP_Aparicio2011.mat'};
-mats = {'GFRP_Aparicio2011', 'CFRP_Aparicio2011.mat'};
+mats = {'CFRP_Aparicio2011.mat'};
 
 % Time/creep
-tmax = 20; %seconds?
-tStep = 0.2; %second between steps
+tmax = 1; %seconds?
+tStep = 1; %second between steps
 % tArr = [1, 8760/2, 8760];
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
@@ -46,7 +46,7 @@ accType = 'const';
 % main.m and shearStress.m. Apply changes with caution.
 if strcmp(accType, 'const')
   % Constant
-  alpha = @(t,wIni) 250*t; % gets multiplied by tStep at end of while loop
+  alpha = @(t,wIni) 100*3.14*t; % gets multiplied by tStep at end of while loop
   % alpha = @(t,wIni) 3.6e6 * t;
 elseif strcmp(accType, 'Linear')
   % Linear Acceleration:
@@ -64,13 +64,14 @@ end
 % alpha = @(t,wIni) (wIni * exp(t/T));
 
 % Plotting
-legTxt = {'0 sec', '5 sec', '10 sec', '15 sec', '20 sec'}; % Controls legend entries for graphs
-plotWhat.custom1 = 'yes';        % any custom plot. Go to plotStressStrain.m to modify (first if statement)
+legTxt = {'Current model', 'Salehian 2019'};
+% legTxt = {'0 sec', '5 sec', '10 sec', '15 sec', '20 sec'}; % Controls legend entries for graphs
+plotWhat.custom1 = 'no';        % any custom plot. Go to plotStressStrain.m to modify (first if statement)
 plotWhat.radDis = 'no';          % Radial displacement v. radius
 plotWhat.radStr = 'no';         % Radial stress v. radius plot
 plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
-plotWhat.shearStr = 'no';       % Shear stress v. radius
-plotWhat.peakStr = 'yes';        % 2-yaxis plot. Peak stress location and SR v. time
+plotWhat.shearStr = 'yes';       % Shear stress v. radius
+plotWhat.peakStr = 'no';        % 2-yaxis plot. Peak stress location and SR v. time
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
@@ -187,7 +188,7 @@ while b*tStep <= tmax
     mat.file{k} = ['MaterialProperties\', mats{k}];
     matProp = load(mat.file{k});
     mat.Q{1,k} = stiffMat(matProp.mstiff, func);
-    mat.rho{k} = matProp.rho;
+    mat.rho{k} = @(r) 7800 + 10.*r + 100.*r.^2 + 1000.*r.^3;
 
     try
       mat.stren{k} = matProp.stren;
@@ -232,14 +233,14 @@ while b*tStep <= tmax
   %% ---------------------------------------------------------------------------
   % Update angular velocity and time
   % ----------------------------------------------------------------------------
-  
+
   if strcmp(accType, 'const')
-    w = w + alpha(tStep,w0);
+    w = w + alpha(tStep,0);
   else
     w = alpha(b*tStep,w0);
   end
   results.time(b) = b*tStep;
-  
+
 %   al(b) = alpha(b*tStep,w0);
 
   b = b + 1;
@@ -252,14 +253,15 @@ end
 % ------------------------------------------------------------------------------
 [SR] = failureIndex(rdiv);
 
-figure()
-hold on
-plot(rArr*1000,SR(15,:), '-o','MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
-plot(rArr*1000,SR(45,:), '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
-ylabel('SR')
-xlabel('Radius [mm]')
-legend('SR \it t=3', 'SR \it t=9')
-set(gca, 'Fontsize', 12)
+% figure()
+% plot(results.time, results.vel)
+% hold on
+% plot(rArr*1000,SR(15,:), '-o','MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
+% plot(rArr*1000,SR(45,:), '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
+% ylabel('angular velocity')
+% xlabel('time')
+% legend('SR \it t=3', 'SR \it t=9')
+% set(gca, 'Fontsize', 12)
 
 %% -----------------------------------------------------------------------------
 % Make Plots
