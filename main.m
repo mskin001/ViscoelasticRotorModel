@@ -19,14 +19,15 @@ st = 'pe';
 
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
-rim = [.1, 0.8];
-% rim = [0.08, 0.2]; % Perez-Aparicio 2011
+% rim = [.1, 0.8];
+% rim = [.05, .1];
+rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-30e6, 0];
-% mats = {'GFRP_Aparicio2011.mat'};
-mats = {'CFRP_Aparicio2011.mat'};
+sigb = [0, 0];
+% mats = {'salehian_Incl718.mat'};
+mats = {'GFRP_Aparicio2011.mat'};
 
 % Time/creep
 tmax = 1; %seconds?
@@ -37,7 +38,7 @@ timeUnit = 's'; % s = sec, h = hours, d = days
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 50000;
+rpm = 17.452;
 rpmMax = 98900;
 accType = 'const';
 
@@ -46,7 +47,7 @@ accType = 'const';
 % main.m and shearStress.m. Apply changes with caution.
 if strcmp(accType, 'const')
   % Constant
-  alpha = @(t,wIni) 100*3.14*t; % gets multiplied by tStep at end of while loop
+  alpha = @(t,wIni) 3.6e5; % gets multiplied by tStep at end of while loop
   % alpha = @(t,wIni) 3.6e6 * t;
 elseif strcmp(accType, 'Linear')
   % Linear Acceleration:
@@ -64,7 +65,7 @@ end
 % alpha = @(t,wIni) (wIni * exp(t/T));
 
 % Plotting
-legTxt = {'Current model', 'Salehian 2019'};
+legTxt = {'Current model', 'Aparicio 2011'};
 % legTxt = {'0 sec', '5 sec', '10 sec', '15 sec', '20 sec'}; % Controls legend entries for graphs
 plotWhat.custom1 = 'no';        % any custom plot. Go to plotStressStrain.m to modify (first if statement)
 plotWhat.radDis = 'no';          % Radial displacement v. radius
@@ -188,7 +189,8 @@ while b*tStep <= tmax
     mat.file{k} = ['MaterialProperties\', mats{k}];
     matProp = load(mat.file{k});
     mat.Q{1,k} = stiffMat(matProp.mstiff, func);
-    mat.rho{k} = @(r) 7800 + 10.*r + 100.*r.^2 + 1000.*r.^3;
+    mat.rho{k} = matProp.rho;
+%     mat.rho{k} = @(r) 7800 + 10.*r + 100.*r.^2 + 1000.*r.^3;
 
     try
       mat.stren{k} = matProp.stren;
@@ -244,22 +246,26 @@ while b*tStep <= tmax
 %   al(b) = alpha(b*tStep,w0);
 
   b = b + 1;
-
+  
+  % ----------------------------------------------------------------------------
+  % Calculate rotor energy
+  % ----------------------------------------------------------------------------
+%   energy(b) = 
 
 end
 
 %% -----------------------------------------------------------------------------
 % Calculate failure criterion
 % ------------------------------------------------------------------------------
-[SR] = failureIndex(rdiv);
+% [SR] = failureIndex(rdiv);
 
-% figure()
-% plot(results.time, results.vel)
-% hold on
+figure()
+plot(results.time, results.vel)
+hold on
 % plot(rArr*1000,SR(15,:), '-o','MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
 % plot(rArr*1000,SR(45,:), '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
-% ylabel('angular velocity')
-% xlabel('time')
+ylabel('angular velocity')
+xlabel('time')
 % legend('SR \it t=3', 'SR \it t=9')
 % set(gca, 'Fontsize', 12)
 

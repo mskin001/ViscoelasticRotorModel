@@ -51,8 +51,8 @@ for k = 1:length(rim)-1
   % Global stiffness matrix for the entire
   K(k:k+1, k:k+1) = K(k:k+1, k:k+1) + kMat;
 
-  fsig = -(mat.rho{k}(rim(k)))*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
-  uw = -(mat.rho{k}(rim(k)))*w^2*fi0*[rim(k)^3; rim(k+1)^3];
+  fsig = -(mat.rho{k})*w^2*fi3*[-rim(k)^3; rim(k+1)^3];
+  uw = -(mat.rho{k})*w^2*fi0*[rim(k)^3; rim(k+1)^3];
 
   fw = -fsig + kMat*uw;
   Fw(k:k+1) = Fw(k:k+1) + fw;

@@ -118,9 +118,9 @@ if strcmp(plotWhat.shearStr, 'yes')
 
   hold on
   plot(rArr*1000, tau{1}*10^-6, 'LineWidth', 1.5)
-  stressData = csvread('salhian_shear_stress.csv', 1, 0);
+  stressData = csvread('aparicio2011_results.csv', 1, 0);
   plot(stressData(:,1)*1000, stressData(:,2), 'k*')
-%   for k = 1:length(tauSubSet)
+% %   for k = 1:length(tauSubSet)
 %     plot(rArr*1000,tauSubSet{k}, 'LineWidth', 1.5);
 %   end
   xlabel('Radius [mm]')
