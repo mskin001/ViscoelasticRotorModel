@@ -20,17 +20,17 @@ st = 'pe';
 % Rotor
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [.1, 0.8];
-% rim = [.05, .1];
-rim = [0.08, 0.2]; % Perez-Aparicio 2011
+rim = [.05, .1];
+% rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
 sigb = [0, 0];
 % mats = {'salehian_Incl718.mat'};
-mats = {'GFRP_Aparicio2011.mat'};
+mats = {'CFRP_Aparicio2011.mat'};
 
 % Time/creep
-tmax = 1; %seconds?
+tmax = 20; %seconds?
 tStep = 1; %second between steps
 % tArr = [1, 8760/2, 8760];
 simTime = tmax;
@@ -38,8 +38,8 @@ timeUnit = 's'; % s = sec, h = hours, d = days
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 17.452;
-rpmMax = 98900;
+rpm = 50000;
+% rpmMax = 97682;
 accType = 'const';
 
 % The following if statment controls which acceleration function is used
@@ -47,7 +47,7 @@ accType = 'const';
 % main.m and shearStress.m. Apply changes with caution.
 if strcmp(accType, 'const')
   % Constant
-  alpha = @(t,wIni) 3.6e5; % gets multiplied by tStep at end of while loop
+  alpha = @(t,wIni) 250; % gets multiplied by tStep at end of while loop
   % alpha = @(t,wIni) 3.6e6 * t;
 elseif strcmp(accType, 'Linear')
   % Linear Acceleration:
@@ -220,7 +220,7 @@ while b*tStep <= tmax
 
   %%----------------------------------------------------------------------------
   % Calculate the share stress on the rim.
-  [~] = shearStress(alpha, accType, b, w0, tStep, rdiv);
+  [~] = shearStress(alpha, accType, b, 0, tStep, rdiv);
 
   %% ---------------------------------------------------------------------------
   % Store results for post processing
@@ -228,7 +228,7 @@ while b*tStep <= tmax
   results.uArr{b} = uArr;
   results.sArr{b} = sArr;
   results.tauArr{b} = tauArr;
-  results.vel(b) = w * (30 / pi);
+  results.vel(b) = w; % * (30 / pi);
 %   fprintf('Current time: %5.2f\n', b*tStep)
 %   fprintf('Iteration %2.0f Complete\n', b)
 
@@ -243,7 +243,7 @@ while b*tStep <= tmax
   end
   results.time(b) = b*tStep;
 
-%   al(b) = alpha(b*tStep,w0);
+  al(b) = alpha(tStep,w0);
 
   b = b + 1;
   

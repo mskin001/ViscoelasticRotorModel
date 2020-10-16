@@ -7,7 +7,7 @@ E22 = mstiff(2);
 G12 = mstiff(3);
 G23 = mstiff(4); % Only used if nu23 is not specified
 nu12 = mstiff(5);
-nu23 = 0.6; % E22/(2*G23)-1;
+nu23 = 0.5; % E22/(2*G23)-1;
 
 if ~strcmp(compFunc,'no')
   s = compFunc(mstiff);
@@ -39,7 +39,7 @@ else
   S11 = 1/E11;
   S22 = 1/E22;
   S33 = S22;
-  nu23 = 0.60;
+  nu23 = 0.50;
   G12 = 1/G12;
 end
 

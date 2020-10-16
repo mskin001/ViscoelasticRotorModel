@@ -6,17 +6,17 @@ a = zeros(1:length(rim) - 1);
 C = zeros(1:length(rim) - 1);
 
 if strcmp(accType, 'const')
-  a(end) = (mat.rho{end} * alpha(b*tStep,w0)) / mat.Q{end}(4,4);
+  a(end) = (mat.rho{end} * alpha(tStep,w0)) / mat.Q{end}(4,4);
 else
   a(end) = (mat.rho{end}(rim(end)) * alpha(b*tStep,w0)) / mat.Q{end}(4,4);
 end
 
-C(end) = (a(end)*rim(end)^4)/8;
+C(end) = (a(end)*(rim(end))^4)/8;
 
 b = 1;
 
 for k = 1:length(rim) - 2
-  a(end-k) = (mat.rho{end-k} * alpha(b*tStep,w0)) / mat.Q{end}(4,4);
+  a(end-k) = (mat.rho{end-k} * alpha(tStep,w0)) / mat.Q{end}(4,4);
   gRatio = mat.Q{end-k+1}(4,4)/mat.Q{end-k}(4,4);
   C(end-k) = (a(end-k) - gRatio * a(end-k+1)) * rim(k+1)^4/8 + gRatio*C(end-k+1);
 end
