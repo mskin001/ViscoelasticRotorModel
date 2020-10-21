@@ -1,6 +1,7 @@
 clc
-clear
+clear all
 close('all','force')
+format long
 %% -----------------------------------------------------------------------------
 % Define global variables
 % ------------------------------------------------------------------------------
@@ -32,7 +33,6 @@ mats = {'CFRP_Aparicio2011.mat'};
 % Time/creep
 tmax = 20; %seconds?
 tStep = 1; %second between steps
-% tArr = [1, 8760/2, 8760];
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
@@ -47,7 +47,7 @@ accType = 'const';
 % main.m and shearStress.m. Apply changes with caution.
 if strcmp(accType, 'const')
   % Constant
-  alpha = @(t,wIni) 250; % gets multiplied by tStep at end of while loop
+  alpha = @(t,wIni) 250 * t; % gets multiplied by tStep at end of while loop
   % alpha = @(t,wIni) 3.6e6 * t;
 elseif strcmp(accType, 'Linear')
   % Linear Acceleration:
@@ -237,13 +237,11 @@ while b*tStep <= tmax
   % ----------------------------------------------------------------------------
 
   if strcmp(accType, 'const')
-    w = w + alpha(tStep,0);
+    w = w + alpha(tStep);
   else
     w = alpha(b*tStep,w0);
   end
   results.time(b) = b*tStep;
-
-  al(b) = alpha(tStep,w0);
 
   b = b + 1;
   

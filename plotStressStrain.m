@@ -117,14 +117,16 @@ if strcmp(plotWhat.shearStr, 'yes')
   end
 
   hold on
-  plot(rArr*1000, tau{1}, 'LineWidth', 1.5)
+  for k = 1:1
+    plot(rArr*1000, tau{end}, 'LineWidth', 1.5)
+  end
 %   stressData = csvread('aparicio2011_results.csv', 1, 0);
 %   plot(stressData(:,1)*1000, stressData(:,2), 'k*')
 % %   for k = 1:length(tauSubSet)
 %     plot(rArr*1000,tauSubSet{k}, 'LineWidth', 1.5);
 %   end
   xlabel('Radius [mm]')
-  ylabel('Shear Stress [MPa]')
+  ylabel('Shear Stress [Pa]')
   legend(legTxt, 'Location', 'northeast')
   set(gca, 'FontSize', 12)
   fprintf('Shear Stress Plot: Complete\n')
