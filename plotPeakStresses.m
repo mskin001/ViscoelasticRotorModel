@@ -19,7 +19,7 @@ figure(1)
 hold on
 plot(results.vel,maxStr(:,1)*10^-6, '-*', 'Color', [0 0.4470 0.7410], 'MarkerIndices', 1:10:length(results.time), 'Linewidth', 1.5)
 plot(results.vel,maxStr(:,2)*10^-6, '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:10:length(results.time), 'Linewidth', 1.5)
-% plot(results.time,maxStr(:,3)*10^-6, 'Linewidth', 1.5)
+% plot(results.vel,maxStr(:,3)*10^-6, 'Linewidth', 1.5)
 
 ylabel('Maximum stress [MPa]')
 xlabel('Angular velocity [rpm]')
@@ -31,13 +31,13 @@ hold on
 plot(results.vel,nStr(:,1), '-*', 'Color', [0 0.4470 0.7410], 'MarkerIndices', 1:10:length(results.time), 'Linewidth', 1.5)
 plot(results.vel,nStr(:,2), '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:10:length(results.time), 'Linewidth', 1.5)
 plot(results.vel,results.peakstr, ':v', 'Color', [0.4660 0.6740 0.1880], 'MarkerIndices', 1:10:length(results.time), 'Linewidth', 1.5)
-% plot(results.time,nStr(:,3), 'Linewidth', 1.5)
+% plot(results.vel,nStr(:,3), 'Linewidth', 1.5)
 
-ylabel('Normalzied stress')
-xlabel('Angular velocity [rpm]')
+ylabel('Normalzied Stress')
+xlabel('Angular Velocity [rpm]')
 legend('Circ. Stress', 'Radial Stress', 'Tsai-Wu SR', 'Location', 'northwest')
 set(gca, 'Fontsize', 12)
-
+grid on
 
 
 

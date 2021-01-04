@@ -23,7 +23,25 @@ halfWay = round(length(sArr)/2);
 
 if strcmp(plotWhat.custom1, 'yes')
 
-
+  hold on
+  plot(rArr*1000, sArr{1}(3,:,1)*10,'-', 'Color', [0 0.4470 0.7410], 'Linewidth', 1.5)
+  stressData = csvread('Apa2011_10xradial.csv');
+  plot(stressData(:,1)*1000, stressData(:,2), 'k*')
+  
+  plot(rArr*1000, sArr{1}(1,:,1), '--', 'Color', [0.6350 0.0780 0.1840], 'Linewidth', 1.5)
+  stressData = csvread('Apa2011_hoop.csv');
+  plot(stressData(:,1)*1000, stressData(:,2), 'kd')
+  
+  plot(rArr*1000, tau{1}*10^-6, ':', 'Color', [0.4940 0.1840 0.5560], 'Linewidth', 1.5)
+  stressData = csvread('aparicio2011_results.csv', 1, 0);
+  plot(stressData(:,1)*1000, stressData(:,2), 'ko')
+  
+  xlabel('Radius [mm]')
+  ylabel('Stress [MPa]')
+  legend('Model 10*\sigma_r', 'Aparicio 10*\sigma_r', 'Model \sigma_\theta',...
+      'Aparicio \sigma_\theta', 'Model \tau_r_\theta', 'Aparicio \tau_r_\theta',...
+      'NumColumns', 3, 'Location', 'southoutside')
+  set(gca, 'FontSize', 12)
   fprintf('Custom plot 1: Complete\n')
 end
 
@@ -127,7 +145,7 @@ if strcmp(plotWhat.shearStr, 'yes')
 %   end
   xlabel('Radius [mm]')
   ylabel('Shear Stress [Pa]')
-  legend(legTxt, 'Location', 'northeast')
+%   legend(legTxt, 'Location', 'northeast')
   set(gca, 'FontSize', 12)
   fprintf('Shear Stress Plot: Complete\n')
 end
@@ -141,16 +159,34 @@ if strcmp(plotWhat.peakStr, 'yes')
   yyaxis right; plot(results.vel,results.peakstr, '-.o', 'MarkerIndices', 1:10:results.vel, 'LineWidth', 1.5);
   yyaxis right; plot(results.vel, ones(length(results.time)), 'k--', 'LineWidth', 1.5)
 
-	xlabel('Angular velocity [rpm]')
-	yyaxis left
-	ylabel('Peak SR Location [mm]')
-	yyaxis right
-	ylabel('Strength Ratio')
-	legend('Peak SR Location', 'SR value', 'Location', 'southeast')
-	set(gca, 'FontSize', 12)
+  xlabel('Angular velocity [rpm]')
+  yyaxis left
+  ylabel('Peak SR Location [mm]')
+  yyaxis right
+  ylabel('Strength Ratio')
+  legend('Peak SR Location', 'SR value', 'Location', 'southeast')
+  set(gca, 'FontSize', 12)
 end
 
+% ------------- Strength Ratio --------------------------------------------
+if strcmp(plotWhat.sr,'yes')
+  figure()
+  hold on
+  
+  plot(rArr*1000, results.SR(1,:), '-o', 'Color', [0 0.4470 0.7410],...
+      'MarkerIndices', 1:5:length(rArr), 'Linewidth', 1.5)
+  plot(rArr*1000, results.SR(50,:), '--d','Color', [0.6350 0.0780 0.1840],...
+      'MarkerIndices', 1:5:length(rArr), 'Linewidth', 1.5)
+  plot(rArr*1000, results.SR(end,:), ':v', 'Color', [0.4940 0.1840 0.5560],...
+      'MarkerIndices', 1:5:length(rArr), 'Linewidth', 1.5)
+  
+  ylabel('Strength Ratio')
+  xlabel('Radius [mm]')
+  legend('SR \it t=1', 'SR \it t=10', 'SR \it t=20')
+  grid on
+  set(gca, 'Fontsize', 12)
 
+end
 
 %% -----------------------------------------------------------------------------
 % Make .gifs

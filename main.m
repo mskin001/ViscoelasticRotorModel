@@ -26,13 +26,13 @@ rim = [.05, .1];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [0, 0];
+sigb = [-30e6, 0];
 % mats = {'salehian_Incl718.mat'};
 mats = {'CFRP_Aparicio2011.mat'};
 
 % Time/creep
 tmax = 20; %seconds?
-tStep = 1; %second between steps
+tStep = .2; %second between steps
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
 compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
@@ -65,21 +65,22 @@ end
 % alpha = @(t,wIni) (wIni * exp(t/T));
 
 % Plotting
-legTxt = {'Current model', 'Aparicio 2011'};
-% legTxt = {'0 sec', '5 sec', '10 sec', '15 sec', '20 sec'}; % Controls legend entries for graphs
+% legTxt = {'Current model', 'Aparicio 2011'};
+legTxt = {'0 sec', '5 sec', '10 sec', '15 sec', '20 sec'}; % Controls legend entries for graphs
 plotWhat.custom1 = 'no';        % any custom plot. Go to plotStressStrain.m to modify (first if statement)
 plotWhat.radDis = 'no';          % Radial displacement v. radius
-plotWhat.radStr = 'no';         % Radial stress v. radius plot
-plotWhat.hoopStr = 'no';        % Hoop stress v. radius plot
+plotWhat.radStr = 'yes';         % Radial stress v. radius plot
+plotWhat.hoopStr = 'yes';        % Hoop stress v. radius plot
 plotWhat.shearStr = 'yes';       % Shear stress v. radius
-plotWhat.peakStr = 'no';        % 2-yaxis plot. Peak stress location and SR v. time
+plotWhat.peakStr = 'yes';        % 2-yaxis plot. Peak stress location and SR v. time
+plotWhat.sr = 'yes';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';
-plotWhat.hoopGifName = 'Hoop Stress.gif';
 plotWhat.hoopGif = 'no';         % Hoop stress gif, surface plot
+plotWhat.hoopGifName = 'Hoop Stress.gif';
 
 plotWhat.interval = 25;          % Display time interval on figures
 plotWhat.delay = 0;              % Time delay in seconds between frames in the gifs,
@@ -163,7 +164,7 @@ fprintf('Check Input Variables: Complete\n')
 w = (pi/30) * rpm; %initial angular velocity
 w0 = w;
 vari = cast(tmax/tStep,'single');
-b = 1;
+b = 0;
 
 while b*tStep <= tmax
 %   fprintf('Create Variable Arrays: Complete\n')
@@ -225,10 +226,10 @@ while b*tStep <= tmax
   %% ---------------------------------------------------------------------------
   % Store results for post processing
   % ----------------------------------------------------------------------------
-  results.uArr{b} = uArr;
-  results.sArr{b} = sArr;
-  results.tauArr{b} = tauArr;
-  results.vel(b) = w; % * (30 / pi);
+  results.uArr{b+1} = uArr;
+  results.sArr{b+1} = sArr;
+  results.tauArr{b+1} = tauArr;
+  results.vel(b+1) = w * (30 / pi);
 %   fprintf('Current time: %5.2f\n', b*tStep)
 %   fprintf('Iteration %2.0f Complete\n', b)
 
@@ -241,31 +242,17 @@ while b*tStep <= tmax
   else
     w = alpha(b*tStep,w0);
   end
-  results.time(b) = b*tStep;
+  results.time(b+1) = b*tStep;
 
   b = b + 1;
-  
-  % ----------------------------------------------------------------------------
-  % Calculate rotor energy
-  % ----------------------------------------------------------------------------
-%   energy(b) = 
 
 end
 
 %% -----------------------------------------------------------------------------
 % Calculate failure criterion
 % ------------------------------------------------------------------------------
-% [SR] = failureIndex(rdiv);
-
-figure()
-plot(results.time, results.vel)
-hold on
-% plot(rArr*1000,SR(15,:), '-o','MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
-% plot(rArr*1000,SR(45,:), '--d', 'Color', [0.6350 0.0780 0.1840], 'MarkerIndices', 1:3:length(rArr), 'Linewidth', 1.5)
-ylabel('angular velocity')
-xlabel('time')
-% legend('SR \it t=3', 'SR \it t=9')
-% set(gca, 'Fontsize', 12)
+[SR] = failureIndex(rdiv);
+results.SR = SR;
 
 %% -----------------------------------------------------------------------------
 % Make Plots
