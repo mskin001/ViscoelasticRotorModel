@@ -1,4 +1,4 @@
-function [s] = Militky15(mstiff)
+function [s] = Militky15_jute_epoxy(mstiff)
 
 global t
 

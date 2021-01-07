@@ -20,10 +20,6 @@ b = 2.912e-7;
 c = -7.472e-12;
 d = -3.708e-5;
 
-s(1) = mstiff(1);
+s = mstiff;
 s(2) = a.*exp(b.*t) + c.*exp(d.*t);
-s(3) = s(2);
-s(4) = mstiff(4);
-s(5) = mstiff(5);
-s(6) = s(5);
-varargout{1} = s;
+varargout{1} = S22;

@@ -15,33 +15,36 @@ global mat plotWhat
 % simulation type:
   % pe = steady state perfectly elastic
   % ve = steady state viscoelastic
-  % qdve = quasi-dynamic viscoelasticu
+  % tr = transient (under construction
 st = 've';
 
-% Rotor
+% Rotor geometry and material
+rim = [.05, 0.06, 0.1];
 % rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.110, 0.2];
-rim = [.05, 0.06, 0.1];
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [1, 0]/1000; % [mm]
 sigb = [0, 0];
-mats = {'Al7075-T6_Ha2006','MS_constructed_CFRP.mat'};
-load('MS_constructedCFRP_zeroVel.mat');
+mats = {'Al7075-T6_Ha2006','IM7_8552_Tzeng2001.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
+% load('MS_constructedCFRP_zeroVel.mat'); %(optional) used to compare to results from a specific time.
 
 % Time/creep
+% compliance function, 1 entry per material, input 'no' to turn off creep
+%   modeling for the correpsonding material
+compFunc = {'no', @IM7_8552_Tzeng2001}; 
 tArr = [1, 8760, 43800];
+
+% These paramterters are only used for outputting results. They are not
+% necessary. May be used in future versions of the program.
 simTime = 10e10;
 timeUnit = 'h'; % s = sec, h = hours, d = days
-numberOfSteps = 3;
-compFunc = {'no' @MS_constructed_CFRP}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
 rpm = 60000;
 vdiv = 1; % number of points to analyze between each fixed velocity
-alpha = 0; %rad/sec^2
 
 % Plotting and saving
 saveResult = false;
@@ -220,10 +223,6 @@ if vari == -1
   return
 end
 fprintf('Descretize Stress/Strain: Complete\n')
-
-%%------------------------------------------------------------------------------
-% Calculate the share stress on the rim. 
-[tau] = shearStress(alpha, rdiv);
 
 
 %% -----------------------------------------------------------------------------
