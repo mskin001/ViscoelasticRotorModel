@@ -54,8 +54,8 @@ if strcmp(plotWhat.radDis, 'yes')
   hold on
   
   plot(rArr*1000,uArr(1,:),'b-o', 'LineWidth', 1)
-  plot(rArr*1000,uArr(2,:),'r-d', 'LineWidth', 1)
-  plot(rArr*1000,uArr(3,:),'k-s', 'LineWidth', 1) 
+%   plot(rArr*1000,uArr(2,:),'r-d', 'LineWidth', 1)
+%   plot(rArr*1000,uArr(3,:),'k-s', 'LineWidth', 1) 
   
   xlabel('Radius [mm]')
   ylabel('Radial Displacement [m]')
@@ -79,8 +79,8 @@ if strcmp(plotWhat.radStr, 'yes')
     %do nothing
   end
   plot(rArr*1000,sArr(3,:,1)*10^-6,'b-o', 'LineWidth', 1)
-  plot(rArr*1000,sArr(3,:,2)*10^-6,'r-d', 'LineWidth', 1)
-  plot(rArr*1000,sArr(3,:,3)*10^-6,'k-s', 'LineWidth', 1)
+%   plot(rArr*1000,sArr(3,:,2)*10^-6,'r-d', 'LineWidth', 1)
+%   plot(rArr*1000,sArr(3,:,3)*10^-6,'k-s', 'LineWidth', 1)
   
   xlabel('Radius [mm]')
   ylabel('Radial Stress [MPa]')
@@ -103,8 +103,8 @@ if strcmp(plotWhat.hoopStr, 'yes')
     %do nothing
   end
   plot(rArr*1000,sArr(1,:,1)*10^-6,'b-o', 'LineWidth', 1)
-  plot(rArr*1000,sArr(1,:,2)*10^-6,'r-d', 'LineWidth', 1)
-  plot(rArr*1000,sArr(1,:,3)*10^-6,'k-s', 'LineWidth', 1)
+%   plot(rArr*1000,sArr(1,:,2)*10^-6,'r-d', 'LineWidth', 1)
+%   plot(rArr*1000,sArr(1,:,3)*10^-6,'k-s', 'LineWidth', 1)
 
   xlabel('Radius [mm]')
   ylabel('Circumferential Stress [MPa]')
