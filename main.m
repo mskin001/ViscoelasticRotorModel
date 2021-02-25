@@ -25,7 +25,7 @@ rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-25e6, 0];
+sigb = [-77.5e6, 0];
 mats = {'Glass_Epoxy_Ha1999.mat'};
 % mats = {'AS_H3501_Ha1999.mat'; 'IM6_Epoxy_Ha1999.mat'};
 % mats = {'IM6_Epoxy_Ha1999.mat'};
@@ -50,11 +50,11 @@ vdiv = 1; % number of points to analyze between each fixed velocity
 saveResult = false;
 resultsFile = 'Run4.mat';
 plotWhat.rims = rim;
-plotWhat.custom1 = 'no';
+plotWhat.custom1 = 'yes';
 
 plotWhat.disGif = 'no';          % Displacement gif, surface plot
 plotWhat.disGifName = 'Displacement.gif';
-plotWhat.radDis = 'yes';
+plotWhat.radDis = 'no';
 
 plotWhat.radGif = 'no';          % Radial stress gif, surface plot
 plotWhat.radialGifName = 'Radial Stress.gif';

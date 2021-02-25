@@ -20,17 +20,28 @@ or = plotWhat.rims;
 % as many custom plots as desired.
 
 if strcmp(plotWhat.custom1, 'yes')
+  haRadData = csvread('Ha99_GFRP_optimized_radialStress.csv');
+  hahoopData = csvread('Ha99_GFRP_optimized_hoopStress.csv');
+  
   nr = rArr ./ min(rArr);
   
   srRad = sArr(3,:,1) ./ mat.stren{1}(3);
   srHoop = sArr(1,:,1) ./ mat.stren{1}(1);
   
+  sw_rad_data = csvread('glass rim-3D Plane Strain-Results-Radial Stress-1.csv',...
+    9,1,[9,1,35,2]);
+  sw_hoop_data = csvread('glass rim-3D Plane Strain-Results-Hoop Stress-3.csv',...
+    9,1,[9,1,35,2]);
+  
+  sw_norm_rad = [sw_rad_data(:,1)/mat.stren{1}(3),sw_rad_data(:,2)/min(sw_rad_data(:,2))];
+  sw_norm_hoop = [sw_hoop_data(:,1)/mat.stren{1}(1),sw_hoop_data(:,2)/min(sw_hoop_data(:,2))];
+  
   radStr = figure();
-  haRadData = csvread('Ha99_GFRP_optimized_radialStress.csv');
-  hahoopData = csvread('Ha99_GFRP_optimized_hoopStress.csv');
   hold on
   plot(haRadData(:,1),haRadData(:,2),'kv-', 'MarkerFaceColor', 'k')
   plot(hahoopData(:,1),hahoopData(:,2),'k^-', 'MarkerFaceColor', 'k')
+  plot(sw_norm_rad(:,2),sw_norm_rad(:,1),'g*', 'MarkerFaceColor', 'g')
+  plot(sw_norm_hoop(:,2),sw_norm_hoop(:,1),'gd', 'MarkerFaceColor', 'g')
   plot(nr,srRad,'b--s', 'LineWidth', 1)
   plot(nr,srHoop, 'r--o', 'LineWidth', 1)
   
