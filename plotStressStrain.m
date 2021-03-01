@@ -2,7 +2,7 @@ function plotStressStrain(legTxt)
 %% -----------------------------------------------------------------------------
 % Define global variables, arrays, and structures
 % ------------------------------------------------------------------------------
-global rim rArr plotWhat results
+global rim rArr plotWhat results matProp
 uArr = results.uArr;
 sArr = results.sArr;
 tau =  results.tauArr;
@@ -27,10 +27,10 @@ if strcmp(plotWhat.custom1, 'yes')
   sw_hoop_data = csvread('Composite Rim-3D Plane Strain-Results-Hoop Stress-2.csv',...
     9,1,[9,1,41,2]);
   hold on
-  plot(rArr*1000, sArr{1}(3,:,1)*10,'-', 'Color', [0 0.4470 0.7410], 'Linewidth', 1.5)
-  plot(rArr*1000, sArr{1}(1,:,1), '--', 'Color', [0.6350 0.0780 0.1840], 'Linewidth', 1.5)
-  plot(sw_rad_data(:,2),sw_rad_data(:,1)*10, 'kv')
-  plot(sw_hoop_data(:,2),sw_hoop_data(:,1), 'k^')
+  plot(rArr*1000, (sArr{1}(3,:,1)/matProp.stren{1}(3)),'-', 'Color', [0 0.4470 0.7410], 'Linewidth', 1.5)
+  plot(rArr*1000, (sArr{1}(1,:,1)/matProp.stren{1}(1)), '--', 'Color', [0.6350 0.0780 0.1840], 'Linewidth', 1.5)
+  plot(sw_rad_data(:,2),(sw_rad_data(:,1)/matProp.stren{1}(3)), 'kv')
+  plot(sw_hoop_data(:,2),(sw_hoop_data(:,1)/matProp.stren{1}(3)), 'k^')
 %   plot(rArr*1000, tau{1}*10^-6, ':', 'Color', [0.4940 0.1840 0.5560], 'Linewidth', 1.5)
 %   stressData = csvread('aparicio2011_results.csv', 1, 0);
 %   plot(stressData(:,1)*1000, stressData(:,2), 'ko')
