@@ -19,14 +19,14 @@ global mat plotWhat results
 st = 'pe';
 
 % Rotor
-% rim = [0.03789; 0.07901]; % single rim Ha 1999
+rim = [0.03789; 0.07901]; % single rim Ha 1999
 % rim = [.1, 0.8];
-rim = [.05, .1];
+% rim = [.05, .1];
 % rim = [0.08, 0.2]; % Perez-Aparicio 2011
 % rim = [0.0762, .1524]; % Tzeng2001
 rdiv = 30; % number of points per rim to analyze
 delta = [0]/1000; % [mm]
-sigb = [-30e6, 0];
+sigb = [-77.5e6, 0];
 % mats = {'salehian_Incl718.mat'};
 mats = {'CFRP_Aparicio2011.mat'};
 
@@ -35,10 +35,10 @@ tmax = 20; %seconds?
 tStep = .2; %second between steps
 simTime = tmax;
 timeUnit = 's'; % s = sec, h = hours, d = days
-compFunc = {'no' 'no'}; % compliance function, input 'no' to turn off creep modeling
+compFunc = {'no'}; % compliance function, input 'no' to turn off creep modeling
 
 % Speed/velocity
-rpm = 50000;
+rpm = 60000;
 % rpmMax = 97682;
 accType = 'const';
 
