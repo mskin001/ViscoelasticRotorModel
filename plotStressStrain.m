@@ -22,19 +22,18 @@ or = rim;
 halfWay = round(length(sArr)/2);
 
 if strcmp(plotWhat.custom1, 'yes')
-
+  sw_rad_data = csvread('glass rim-Shear Stress-Results-Radial Stress-1.csv',...
+    9,1,[9,1,41,2]);
+  sw_hoop_data = csvread('glass rim-Shear Stress-Results-Hoop Stress-2.csv',...
+    9,1,[9,1,41,2]);
   hold on
   plot(rArr*1000, sArr{1}(3,:,1)*10,'-', 'Color', [0 0.4470 0.7410], 'Linewidth', 1.5)
-  stressData = csvread('Apa2011_10xradial.csv');
-  plot(stressData(:,1)*1000, stressData(:,2), 'k*')
-  
   plot(rArr*1000, sArr{1}(1,:,1), '--', 'Color', [0.6350 0.0780 0.1840], 'Linewidth', 1.5)
-  stressData = csvread('Apa2011_hoop.csv');
-  plot(stressData(:,1)*1000, stressData(:,2), 'kd')
-  
-  plot(rArr*1000, tau{1}*10^-6, ':', 'Color', [0.4940 0.1840 0.5560], 'Linewidth', 1.5)
-  stressData = csvread('aparicio2011_results.csv', 1, 0);
-  plot(stressData(:,1)*1000, stressData(:,2), 'ko')
+  plot(sw_rad_data(:,2)*25.4,sw_rad_data(:,1)*10, 'kv')
+  plot(sw_hoop_data(:,2)*25.4,sw_hoop_data(:,1), 'k^')
+%   plot(rArr*1000, tau{1}*10^-6, ':', 'Color', [0.4940 0.1840 0.5560], 'Linewidth', 1.5)
+%   stressData = csvread('aparicio2011_results.csv', 1, 0);
+%   plot(stressData(:,1)*1000, stressData(:,2), 'ko')
   
   xlabel('Radius [mm]')
   ylabel('Stress [MPa]')
