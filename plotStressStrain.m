@@ -2,7 +2,7 @@ function plotStressStrain(legTxt)
 %% -----------------------------------------------------------------------------
 % Define global variables, arrays, and structures
 % ------------------------------------------------------------------------------
-global rim rArr plotWhat results matProp
+global rim rArr plotWhat results mat
 uArr = results.uArr;
 sArr = results.sArr;
 tau =  results.tauArr;
@@ -22,19 +22,21 @@ or = rim;
 halfWay = round(length(sArr)/2);
 
 if strcmp(plotWhat.custom1, 'yes')
-  sw_rad_data = csvread('Composite Rim-3D Plane Strain-Results-Radial Stress-1.csv',...
-    9,1,[9,1,41,2]);
-  sw_hoop_data = csvread('Composite Rim-3D Plane Strain-Results-Hoop Stress-2.csv',...
-    9,1,[9,1,41,2]);
+  sw_rad_data = csvread('SW Results- Glass -250 Acc-Radial Stress.csv',...
+    9,1,[9,1,35,2]);
+  sw_hoop_data = csvread('SW Results-T300 2500-250 Acc-Hoop Stress.csv',...
+    9,1,[9,1,35,2]);
   hold on
-  plot(rArr*1000, (sArr{1}(3,:,1)/matProp.stren{1}(3)),'-', 'Color', [0 0.4470 0.7410], 'Linewidth', 1.5)
-  plot(rArr*1000, (sArr{1}(1,:,1)/matProp.stren{1}(1)), '--', 'Color', [0.6350 0.0780 0.1840], 'Linewidth', 1.5)
-  plot(sw_rad_data(:,2),(sw_rad_data(:,1)/matProp.stren{1}(3)), 'kv')
-  plot(sw_hoop_data(:,2),(sw_hoop_data(:,1)/matProp.stren{1}(3)), 'k^')
+  plot(rArr*1000, (sArr{1}(3,:,1)/mat.stren{1}(3)),'-', 'Color', [0 0.4470 0.7410], 'Linewidth', 1.5)
+  plot(rArr*1000, (sArr{1}(1,:,1)/mat.stren{1}(1)), '--', 'Color', [0.6350 0.0780 0.1840], 'Linewidth', 1.5)
+  plot(sw_rad_data(:,2),(sw_rad_data(:,1)/mat.stren{1}(3)), 'kv')
+  plot(sw_hoop_data(:,2),(sw_hoop_data(:,1)/mat.stren{1}(1)), 'k^')
 %   plot(rArr*1000, tau{1}*10^-6, ':', 'Color', [0.4940 0.1840 0.5560], 'Linewidth', 1.5)
 %   stressData = csvread('aparicio2011_results.csv', 1, 0);
 %   plot(stressData(:,1)*1000, stressData(:,2), 'ko')
-  
+  figure(2)
+  hold on
+  plot(rArr*1000, (sArr{1}(3,:,1)/mat.stren{1}(3))-(sw_rad_data(:,1)/mat.stren{1}(3)))
   xlabel('Radius [mm]')
   ylabel('Stress [MPa]')
   legend('Model 10*\sigma_r', 'Model \sigma_\theta', 'SW 10*\sigma_r',...
